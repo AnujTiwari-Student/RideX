@@ -18,13 +18,15 @@ const userSchema = mongoose.Schema({
         required: true,
         type: String,
         unique: true,
+        lowercase: true,
+        match: [/\S+@\S+\.\S+/ , 'Please enter a valid email'],
     },
     password: {
         type: String,
         required: true,
         select: false,
     },
-    socketId: Number
+    socketId: String
 })
 
 userSchema.methods.generateAuthToken = function(){
