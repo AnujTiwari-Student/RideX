@@ -27,7 +27,7 @@ module.exports.registerUser = async function(req, res){
     const token = user.generateAuthToken();
     res.cookie('token', token , {httpOnly: true})
 
-    res.status(200).json({token , user})
+    res.status(201).json({token , user})
 }
 
 module.exports.loginUser = async function(req, res){

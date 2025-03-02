@@ -32,7 +32,7 @@ module.exports.createCaptain = async (req , res)=>{
 
         res.cookie('token', token , {httpOnly: true})
 
-        res.status(200).json({token , captain})
+        res.status(201).json({token , captain})
 
     } catch (error) {
         res.status(400).send(error.message)

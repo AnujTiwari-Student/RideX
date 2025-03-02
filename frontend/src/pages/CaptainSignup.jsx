@@ -1,27 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { setFirstName , setLastName , setEmail , setPassword , setServerResponse } from "../features/captainSlice";
 
 const CaptainSignup = () => {
-  const [formData, setFormData] = useState({
-    fullname: {
-      firstName: "",
-      lastName: "",
-    },
-    email: "",
-    password: "",
-  });
 
-  const formHandler = (e) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const {fullname, email, password} = useSelector(state => state.captain);
+
+  const formHandler = async (e) => {
     e.preventDefault();
-    setFormData({
+    const newCaptain = {
       fullname: {
-        firstName: "",
-        lastName: "",
+        firstname: fullname.firstname.trim(),
+        lastname: fullname.lastname.trim(),
       },
-      email: "",
-      password: "",
-    });
-    console.log(formData);
+      email: email.trim(),
+      password: password.trim(),
+    }
+
+    try{
+      console.log("Sending registration request:", newCaptain);
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/register`, newCaptain);
+      console.log("Backend response:", response);
+
+      if(response.status === 201){
+        console.log("Registration successful, navigating to /account");
+        dispatch(setServerResponse(response.data));
+        navigate("/captain-account");
+
+        console.log("Resetting form fields...");
+        dispatch(setFirstName(""));
+        dispatch(setLastName(""));
+        dispatch(setEmail(""));
+        dispatch(setPassword(""));
+      }
+    }catch(error){
+      console.log("Registration failed:", error);
+      dispatch(setServerResponse(error.response.data));
+    }
   };
 
   return (
@@ -34,15 +54,9 @@ const CaptainSignup = () => {
               <input
                 type="text"
                 name="firstname"
-                value={formData.fullname.firstName}
+                value={fullname.firstname}
                 onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    fullname: {
-                      ...formData.fullname,
-                      firstName: e.target.value,
-                    },
-                  });
+                  dispatch(setFirstName(e.target.value));
                 }}
                 required
                 placeholder="John"
@@ -51,15 +65,9 @@ const CaptainSignup = () => {
               <input
                 type="text"
                 name="lastname"
-                value={formData.fullname.lastName}
+                value={fullname.lastname}
                 onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    fullname: {
-                      ...formData.fullname,
-                      lastName: e.target.value,
-                    },
-                  });
+                  dispatch(setLastName(e.target.value));
                 }}
                 placeholder="Dave"
                 className="border-1 border-gray-400 rounded-md px-4 w-1/2 outline-none py-2 mt-2"
@@ -73,12 +81,9 @@ const CaptainSignup = () => {
                 id="email"
                 type="email"
                 name="email"
-                value={formData.email}
+                value={email}
                 onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    email: e.target.value,
-                  });
+                  dispatch(setEmail(e.target.value));
                 }}
                 required
                 placeholder="email@example.com"
@@ -93,12 +98,9 @@ const CaptainSignup = () => {
                 id="password"
                 type="password"
                 name="password"
-                value={formData.password}
+                value={password}
                 onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    password: e.target.value,
-                  });
+                  dispatch(setPassword(e.target.value));
                 }}
                 placeholder="Password"
                 required

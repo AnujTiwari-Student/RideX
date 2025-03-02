@@ -1,27 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link , useNavigate } from "react-router-dom";
+import axios from "axios";
+import { setEmail , setFirstName , setLastName , setPassword , setServerResponse } from "../features/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { loginSuccess } from "../features/authSlice";
 
 const UserSignup = () => {
-  const [formData, setFormData] = useState({
-    fullname: {
-      firstName: "",
-      lastName: "",
-    },
-    email: "",
-    password: "",
-  });
 
-  const formHandler = (e) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const {fullname , email , password} = useSelector((state) => state.user);
+
+  const formHandler = async (e) => {
     e.preventDefault();
-    setFormData({
+
+    const newUser = {
       fullname: {
-        firstName: "",
-        lastName: "",
+        firstname: fullname.firstname.trim(),
+        lastname: fullname.lastname.trim(),
       },
-      email: "",
-      password: "",
-    });
-    console.log(formData);
+      email: email.trim(),
+      password: password.trim(),
+    };
+
+    try {
+      console.log("Sending registration request:", newUser);
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser);
+      console.log("Backend response:", response);
+
+      localStorage.setItem("token", response.data.token);
+      dispatch(loginSuccess({token: response.data.token}));
+
+      if (response.status === 201) {
+        console.log("Registration successful, navigating to /account");
+        dispatch(setServerResponse(response.data));
+        navigate("/account");
+
+        console.log("Resetting form fields...");
+        dispatch(setFirstName(""));
+        dispatch(setLastName(""));
+        dispatch(setEmail(""));
+        dispatch(setPassword(""));
+      }
+    }catch(error){
+      console.error("Error during registration:", error);
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+      console.error("Response status:", error.response.status);
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+    } else {
+      console.error("Error message:", error.message);
+    }
+    }
   };
 
   return (
@@ -34,15 +66,9 @@ const UserSignup = () => {
               <input
                 type="text"
                 name="firstname"
-                value={formData.fullname.firstName}
+                value={fullname.firstname}
                 onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    fullname: {
-                      ...formData.fullname,
-                      firstName: e.target.value,
-                    },
-                  });
+                  dispatch(setFirstName(e.target.value));
                 }}
                 required
                 placeholder="John"
@@ -51,15 +77,9 @@ const UserSignup = () => {
               <input
                 type="text"
                 name="lastname"
-                value={formData.fullname.lastName}
+                value={fullname.lastname}
                 onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    fullname: {
-                      ...formData.fullname,
-                      lastName: e.target.value,
-                    },
-                  });
+                  dispatch(setLastName(e.target.value));
                 }}
                 placeholder="Dave"
                 className="border-1 border-gray-400 rounded-md px-4 w-1/2 outline-none py-2 mt-2"
@@ -73,12 +93,9 @@ const UserSignup = () => {
                 id="email"
                 type="email"
                 name="email"
-                value={formData.email}
+                value={email}
                 onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    email: e.target.value,
-                  });
+                  dispatch(setEmail(e.target.value));
                 }}
                 required
                 placeholder="email@example.com"
@@ -91,12 +108,9 @@ const UserSignup = () => {
                 id="password"
                 type="password"
                 name="password"
-                value={formData.password}
+                value={password}
                 onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    password: e.target.value,
-                  });
+                  dispatch(setPassword(e.target.value));
                 }}
                 placeholder="Password"
                 required

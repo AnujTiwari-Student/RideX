@@ -2,11 +2,12 @@ import {createSlice , nanoid} from '@reduxjs/toolkit';
 
 const initialState = {
     fullname: {
-        firstName: '',
-        lastName: ''
+        firstname: '',
+        lastname: ''
     },
     email: '',
     password: '',
+    serverResponse: null,
 }
 
 export const userSlice = createSlice({
@@ -14,10 +15,10 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         setFirstName: (state, action) => {
-            state.fullname.firstName = action.payload
+            state.fullname.firstname = action.payload
         },
         setLastName: (state, action) => {
-            state.fullname.lastName = action.payload
+            state.fullname.lastname = action.payload
         },
         setEmail: (state, action) => {
             state.email = action.payload
@@ -25,9 +26,12 @@ export const userSlice = createSlice({
         setPassword: (state, action) => {
             state.password = action.payload
         },
+        setServerResponse: (state, action) => {
+            state.serverResponse = action.payload; 
+        },
     }
 })
 
-export const {setFirstName, setLastName, setEmail, setPassword} = userSlice.actions;
+export const {setFirstName, setLastName, setEmail, setPassword , setServerResponse} = userSlice.actions;
 
 export default userSlice.reducer
