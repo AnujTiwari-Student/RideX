@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const storedToken = localStorage.getItem("captainToken");
+
 const initialState = {
-    isAuthenticated: false, 
-    token: null, 
+    isAuthenticated: !!storedToken, 
+    token: storedToken ||null, 
 }
 
 export const captainAuthSlice = createSlice({
@@ -12,10 +14,12 @@ export const captainAuthSlice = createSlice({
         loginSuccess: (state, action) => {
             state.isAuthenticated = true;
             state.token = action.payload.token; 
+            localStorage.setItem("captainToken", action.payload.token);
         },
         logout: (state) => {
             state.isAuthenticated = false;
             state.token = null;
+            localStorage.removeItem("captainToken");
         },
     },
 });

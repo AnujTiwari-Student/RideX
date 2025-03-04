@@ -11,7 +11,7 @@ const initialState = {
     vehicle: {
         color: '',
         plate: '',
-        capacity: 1,
+        capacity: '',
         vehicleType: ''
     },
     location: {
@@ -64,6 +64,6 @@ export const captainSlice = createSlice({
     },
 });
 
-export const {setFirstName , setLastName , setEmail, setPassword, setStatus, setVehicle, setLocation, setServerResponse} = captainSlice.actions;
+export const {setFirstName , setLastName , setEmail, setPassword, setStatus, setColor , setCapacity , setPlate , setVehicleType, setLat , setLng, setServerResponse} = captainSlice.actions;
 
 export default captainSlice.reducer;

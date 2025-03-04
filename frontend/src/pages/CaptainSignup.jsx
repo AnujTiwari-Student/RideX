@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { setFirstName , setLastName , setEmail , setPassword , setServerResponse } from "../features/captainSlice";
+import { setFirstName , setLastName , setEmail , setPassword , setServerResponse , setCapacity , setColor , setPlate , setVehicleType } from "../features/captainSlice";
+import '../App.css';
+import { loginSuccess } from "../features/captainAuthSlice";
 
 const CaptainSignup = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {fullname, email, password} = useSelector(state => state.captain);
+  const {fullname, email, password , vehicle } = useSelector(state => state.captain);
 
   const formHandler = async (e) => {
     e.preventDefault();
@@ -20,6 +22,12 @@ const CaptainSignup = () => {
       },
       email: email.trim(),
       password: password.trim(),
+      vehicle: {
+        color: vehicle.color.trim(),
+        plate: vehicle.plate.trim(),
+        capacity: vehicle.capacity,
+        vehicleType: vehicle.vehicleType.trim()
+      }
     }
 
     try{
@@ -27,8 +35,11 @@ const CaptainSignup = () => {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/register`, newCaptain);
       console.log("Backend response:", response);
 
+      localStorage.setItem("captainToken", response.data.token);
+      dispatch(loginSuccess({token: response.data.token}));
+
       if(response.status === 201){
-        console.log("Registration successful, navigating to /account");
+        console.log("Registration successful, navigating to /captain-account");
         dispatch(setServerResponse(response.data));
         navigate("/captain-account");
 
@@ -97,7 +108,7 @@ const CaptainSignup = () => {
               <input
                 id="password"
                 type="password"
-                name="password"
+                name="color"
                 value={password}
                 onChange={(e) => {
                   dispatch(setPassword(e.target.value));
@@ -106,6 +117,66 @@ const CaptainSignup = () => {
                 required
                 className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
               />
+            </div>
+            <div className="mb-6">
+              <label htmlFor="vehicle" className="text-xl font-semibold">
+                Vehicle
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  id="color"
+                  type="text"
+                  name="color"
+                  value={vehicle.color}
+                  onChange={(e) => {
+                    dispatch(setColor(e.target.value));
+                  }}
+                  placeholder="Color"
+                  required
+                  className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
+                />
+                <input
+                  id="plate"
+                  type="text"
+                  name="plate"
+                  value={vehicle.plate}
+                  onChange={(e) => {
+                    dispatch(setPlate(e.target.value));
+                  }}
+                  placeholder="Number"
+                  required
+                  className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
+                />
+                <input
+                  id="capacity"
+                  type="number"
+                  name="capacity"
+                  value={vehicle.capacity}
+                  onChange={(e) => {
+                    dispatch(setCapacity(e.target.value));
+                  }}
+                  placeholder="Capacity"
+                  required
+                  className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
+                />
+                <select
+                  id="vehicleType"
+                  name="vehicleType"
+                  value={vehicle.vehicleType}
+                  onChange={(e) => {
+                    dispatch(setVehicleType(e.target.value));
+                  }}
+                  required
+                  className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
+                >
+                  <option value="" disabled>
+                    Select Type
+                  </option>
+                  <option value="car">Car</option>
+                  <option value="motorcycle">Motorcycle</option>
+                  <option value="auto">Auto</option>
+                </select>
+              </div>
             </div>
             <button className="bg-black w-full rounded-md font-semibold tracking-wider text-center text-white py-[8px]">
               Register
