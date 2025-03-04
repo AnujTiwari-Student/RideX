@@ -48,6 +48,10 @@ const CaptainSignup = () => {
         dispatch(setLastName(""));
         dispatch(setEmail(""));
         dispatch(setPassword(""));
+        dispatch(setColor(""));
+        dispatch(setPlate(""));
+        dispatch(setCapacity(""));
+        dispatch(setVehicleType(""));
       }
     }catch(error){
       console.log("Registration failed:", error);

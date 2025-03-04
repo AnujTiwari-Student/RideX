@@ -7,7 +7,7 @@ const initialState = {
     },
     email: '',
     password: '',
-    status: '',
+    status: "inactive",
     vehicle: {
         color: '',
         plate: '',
@@ -15,8 +15,8 @@ const initialState = {
         vehicleType: ''
     },
     location: {
-        lat: null,
-        lng: null,
+        lat: "",
+        lng: "",
     },
     serverResponse: null,
 }

@@ -64,7 +64,7 @@ module.exports.logoutUser = async function(req, res){
     res.clearCookie('token')
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
     if (!token) {
-        return res.status(400).json({ message: 'No token provided' });
+        return res.status(400).json({ message: 'Unauthorized' });
     }
     const result = await blacklistTokenModel.updateOne(
         { token }, 
