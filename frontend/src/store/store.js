@@ -4,6 +4,7 @@ import captainReducer from '../features/captainSlice'
 import authReducer from '../features/authSlice'
 import captainAuthReducer from '../features/captainAuthSlice'
 import userLocationReducer from '../features/userLocationSlice'
+import selectedVehicleReducer from '../features/selectedVehicleSlice'
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     auth: authReducer,
     captainAuth: captainAuthReducer,
     userLocation: userLocationReducer,
+    selectedVehicle: selectedVehicleReducer,
   }
 })
 
