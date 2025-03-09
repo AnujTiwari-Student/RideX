@@ -10,55 +10,73 @@ import { useNavigate } from 'react-router-dom'
 import LocationPanel from '../components/LocationPanel'
 import VehiclePanel from '../components/VehiclePanel'
 import SelectedVehiclePanel from '../components/SelectedVehiclePanel'
-import SearchingCaptain from '../components/SearchingCaptain'
+import LookingForDriver from '../components/LookingForDriver'
+import DriverFound from '../components/DriverFound'
 
 const Account = () => {
   const dispatch = useDispatch()
   const { pickup, destination } = useSelector((state) => state.userLocation)
-  const [panelOpen, setPanelOpen] = useState(false)
-  const panelRef = useRef(null)
   const navigate = useNavigate();
-  const panelCloseRef = useRef(null)
+  
+  const [panelOpen, setPanelOpen] = useState(false)
   const [vehiclePanel, setVehiclePanel] = useState(false)
   const [selectedVehiclePanel, setSelectedVehiclePanel] = useState(false)
+  const [lookingForDriver, setLookingForDriver] = useState(false)
+  const [driverFound, setDriverFound] = useState(true)
+
+  const panelCloseRef = useRef(null)
+  const panelRef = useRef(null)
   const vehiclePanelRef = useRef(null)
   const selectedVehicleRef = useRef(null)
+  const lookingForDriverRef = useRef(null)
+  const driverFoundRef = useRef(null)
 
   useEffect(() => {
-    gsap.to(panelRef.current, {
-      height: panelOpen ? "68%" : "0%",
-      paddingLeft: panelOpen ? 24 : 0 ,
-      paddingRight: panelOpen ? 24 : 0 ,
-      duration: 0.5,
+    const animations = [
+      {
+        ref: panelRef,
+        state: panelOpen,
+        animation: { height: "68%", paddingLeft: 24, paddingRight: 24 },
+        reverse: { height: "0%", paddingLeft: 0, paddingRight: 0 },
+      },
+      {
+        ref: panelCloseRef,
+        state: panelOpen,
+        animation: { opacity: 1 },
+        reverse: { opacity: 0 },
+      },
+      {
+        ref: vehiclePanelRef,
+        state: vehiclePanel,
+        animation: { transform: "translateY(0)" },
+        reverse: { transform: "translateY(100%)" },
+      },
+      {
+        ref: driverFoundRef,
+        state: driverFound,
+        animation: { transform: "translateY(0)" },
+        reverse: { transform: "translateY(100%)" },
+      },
+      {
+        ref: lookingForDriverRef,
+        state: lookingForDriver,
+        animation: { transform: "translateY(0)" },
+        reverse: { transform: "translateY(100%)" },
+      },
+      {
+        ref: selectedVehicleRef,
+        state: selectedVehiclePanel,
+        animation: { transform: "translateY(0)" },
+        reverse: { transform: "translateY(100%)" },
+      },
+    ];
+
+    animations.forEach(({ ref, state, animation, reverse }) => {
+      if (ref.current) {
+        gsap.to(ref.current, state ? animation : reverse);
+      }
     });
-    gsap.to(panelCloseRef.current,{
-      opacity: panelOpen ? "1" : "0"
-    })
-  }, [panelOpen]);
-
-  useEffect(()=>{
-      if(vehiclePanel){
-      gsap.to(vehiclePanelRef.current, {
-        transform: 'translateY(0)'
-      })
-    }else{
-      gsap.to(vehiclePanelRef.current, {
-        transform: 'translateY(100%)'
-      })
-    }
-  } , [vehiclePanel])
-
-  useEffect(()=>{
-    if(selectedVehiclePanel){
-    gsap.to(selectedVehicleRef.current, {
-      transform: 'translateY(0)'
-    })
-  }else{
-    gsap.to(selectedVehicleRef.current, {
-      transform: 'translateY(100%)'
-    })
-  }
-} , [selectedVehiclePanel])
+  }, [panelOpen, vehiclePanel, driverFound, lookingForDriver, selectedVehiclePanel]);
 
   const submitHandler = (e) => {
     e.preventDefault()
@@ -122,10 +140,13 @@ const Account = () => {
         <VehiclePanel selectedVehiclePanel={setSelectedVehiclePanel} setVehiclePanel={setVehiclePanel} />
       </div>
       <div ref={selectedVehicleRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}>
-        <SelectedVehiclePanel selectedVehiclePanel={setSelectedVehiclePanel} />
+        <SelectedVehiclePanel selectedVehiclePanel={setSelectedVehiclePanel} lookingForDriver={setLookingForDriver} />
       </div>
-      <div ref={selectedVehicleRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}>
-        <SearchingCaptain selectedVehiclePanel={setSelectedVehiclePanel} />
+      <div ref={lookingForDriverRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}>
+        <LookingForDriver />
+      </div>
+      <div ref={driverFoundRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl`}>
+        <DriverFound driverFound={setDriverFound} />
       </div>
     </div>
   )

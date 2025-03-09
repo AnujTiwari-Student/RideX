@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SelectedVehiclePanel = ({ selectedVehiclePanel }) => {
+const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
   return (
     <div>
       <div onClick={()=>{
@@ -43,7 +43,9 @@ const SelectedVehiclePanel = ({ selectedVehiclePanel }) => {
                 </p>
             </div>
         </div>
-        <button className='text-lg font-semibold bg-black text-white rounded-md py-2 w-full'>
+        <button onClick={()=>{
+          selectedVehiclePanel(false) , lookingForDriver(true)
+        }} className='text-lg font-semibold bg-black text-white rounded-md py-2 w-full'>
             Confirm Ride
         </button>
       </div>
