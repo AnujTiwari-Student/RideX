@@ -1,75 +1,53 @@
-import React, { useEffect, useState } from "react";
-import { Link , useNavigate } from "react-router-dom";
-import axios from "axios";
-import { setEmail , setFirstName , setLastName , setPassword , setServerResponse } from "../features/userSlice";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { createUser } from "../features/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { loginSuccess } from "../features/authSlice";
+import toast from "react-hot-toast";
 
 const UserSignup = () => {
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {fullname , email , password} = useSelector((state) => state.user);
+  const [userData, setUserData] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: "",
+  });
 
-  const formHandler = async (e) => {
+  const handleChange = (e) => {
+    setUserData({
+      ...userData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    const newUser = {
-      fullname: {
-        firstname: fullname.firstname.trim(),
-        lastname: fullname.lastname.trim(),
-      },
-      email: email.trim(),
-      password: password.trim(),
-    };
-
-    try {
-      console.log("Sending registration request:", newUser);
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser);
-      console.log("Backend response:", response);
-
-      localStorage.setItem("token", response.data.token);
-      dispatch(loginSuccess({token: response.data.token}));
-
-      if (response.status === 201) {
-        console.log("Registration successful, navigating to /account");
-        dispatch(setServerResponse(response.data));
+    dispatch(createUser(userData))
+      .unwrap()
+      .then((res) => {
         navigate("/account");
-
-        console.log("Resetting form fields...");
-        dispatch(setFirstName(""));
-        dispatch(setLastName(""));
-        dispatch(setEmail(""));
-        dispatch(setPassword(""));
-      }
-    }catch(error){
-      console.error("Error during registration:", error);
-    if (error.response) {
-      console.error("Response data:", error.response.data);
-      console.error("Response status:", error.response.status);
-    } else if (error.request) {
-      console.error("No response received:", error.request);
-    } else {
-      console.error("Error message:", error.message);
-    }
-    }
+        toast.success("User Created successfully");
+      })
+      .catch((err) => {
+        toast.error(err);
+        console.error(err);
+      });
   };
 
   return (
     <>
       <div className="flex h-screen justify-between flex-col">
         <div className="container pt-10 px-6">
-          <form action="" onSubmit={formHandler}>
+          <form action="" onSubmit={handleSubmit}>
             <h3 className="text-xl font-semibold">What's your first Name</h3>
             <div className="mb-4 flex gap-2 w-full">
               <input
                 type="text"
                 name="firstname"
-                value={fullname.firstname}
-                onChange={(e) => {
-                  dispatch(setFirstName(e.target.value));
-                }}
+                value={userData.firstname}
+                onChange={handleChange}
                 required
                 placeholder="John"
                 className="border-1 border-gray-400 rounded-md px-4 w-1/2 outline-none py-2 mt-2"
@@ -77,10 +55,8 @@ const UserSignup = () => {
               <input
                 type="text"
                 name="lastname"
-                value={fullname.lastname}
-                onChange={(e) => {
-                  dispatch(setLastName(e.target.value));
-                }}
+                value={userData.lastname}
+                onChange={handleChange}
                 placeholder="Dave"
                 className="border-1 border-gray-400 rounded-md px-4 w-1/2 outline-none py-2 mt-2"
               />
@@ -93,25 +69,23 @@ const UserSignup = () => {
                 id="email"
                 type="email"
                 name="email"
-                value={email}
-                onChange={(e) => {
-                  dispatch(setEmail(e.target.value));
-                }}
+                value={userData.email}
+                onChange={handleChange}
                 required
                 placeholder="email@example.com"
                 className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
               />
             </div>
             <div className="mb-6">
-              <label htmlFor="password" className="text-xl font-semibold">Enter password</label>
+              <label htmlFor="password" className="text-xl font-semibold">
+                Enter password
+              </label>
               <input
                 id="password"
                 type="password"
                 name="password"
-                value={password}
-                onChange={(e) => {
-                  dispatch(setPassword(e.target.value));
-                }}
+                value={userData.password}
+                onChange={handleChange}
                 placeholder="Password"
                 required
                 className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
@@ -129,7 +103,9 @@ const UserSignup = () => {
           </p>
         </div>
         <div className="container px-6 z-50 mb-4">
-          <p className="text-[10px]">By proceeding, you concent to get calls, Whatsapp or SMS from RideX</p>
+          <p className="text-[10px]">
+            By proceeding, you concent to get calls, Whatsapp or SMS from RideX
+          </p>
         </div>
       </div>
     </>

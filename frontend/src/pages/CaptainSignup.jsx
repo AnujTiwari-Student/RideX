@@ -1,78 +1,61 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { setFirstName , setLastName , setEmail , setPassword , setServerResponse , setCapacity , setColor , setPlate , setVehicleType } from "../features/captainSlice";
 import '../App.css';
-import { loginSuccess } from "../features/captainAuthSlice";
+import { createCaptain } from "@/features/captainSlice";
+import toast from "react-hot-toast";
 
 const CaptainSignup = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {fullname, email, password , vehicle } = useSelector(state => state.captain);
+  const {loading} = useSelector((state)=> state.captain)
 
-  const formHandler = async (e) => {
-    e.preventDefault();
-    const newCaptain = {
-      fullname: {
-        firstname: fullname.firstname.trim(),
-        lastname: fullname.lastname.trim(),
-      },
-      email: email.trim(),
-      password: password.trim(),
-      vehicle: {
-        color: vehicle.color.trim(),
-        plate: vehicle.plate.trim(),
-        capacity: vehicle.capacity,
-        vehicleType: vehicle.vehicleType.trim()
-      }
-    }
+  const [captainData, setCaptainData] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: "",
+    vehicleCapacity: "",
+    vehicleColor: "",
+    vehiclePlate: "",
+    vehicleType: "",
+  })
 
-    try{
-      console.log("Sending registration request:", newCaptain);
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/register`, newCaptain);
-      console.log("Backend response:", response);
+  const handleChange = (event) => {
+    setCaptainData({
+      ...captainData,
+      [event.target.name]: event.target.value,
+    });
+  }
 
-      localStorage.setItem("captainToken", response.data.token);
-      dispatch(loginSuccess({token: response.data.token}));
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    dispatch(createCaptain(captainData))
+    .unwrap()
+    .then((res)=>{
+      navigate("/captain/dashboard")
+      toast.success('Captain registered successfully')
+    })
+    .catch((err)=>{
+      toast.error('Failed to create captain')
+    })
 
-      if(response.status === 201){
-        console.log("Registration successful, navigating to /captain-account");
-        dispatch(setServerResponse(response.data));
-        navigate("/captain-account");
-
-        console.log("Resetting form fields...");
-        dispatch(setFirstName(""));
-        dispatch(setLastName(""));
-        dispatch(setEmail(""));
-        dispatch(setPassword(""));
-        dispatch(setColor(""));
-        dispatch(setPlate(""));
-        dispatch(setCapacity(""));
-        dispatch(setVehicleType(""));
-      }
-    }catch(error){
-      console.log("Registration failed:", error);
-      dispatch(setServerResponse(error.response.data));
-    }
-  };
+  }
 
   return (
     <>
       <div className="flex h-screen justify-between flex-col">
         <div className="container pt-10 px-6">
-          <form action="" onSubmit={formHandler}>
+          <form action="" onSubmit={handleSubmit}>
             <h3 className="text-xl font-semibold">What's your Name</h3>
             <div className="mb-4 flex gap-2 w-full">
               <input
                 type="text"
                 name="firstname"
-                value={fullname.firstname}
-                onChange={(e) => {
-                  dispatch(setFirstName(e.target.value));
-                }}
+                value={captainData.firstname}
+                onChange={handleChange}
                 required
                 placeholder="John"
                 className="border-1 border-gray-400 rounded-md px-4 w-1/2 outline-none py-2 mt-2"
@@ -80,10 +63,8 @@ const CaptainSignup = () => {
               <input
                 type="text"
                 name="lastname"
-                value={fullname.lastname}
-                onChange={(e) => {
-                  dispatch(setLastName(e.target.value));
-                }}
+                value={captainData.lastname}
+                onChange={handleChange}
                 placeholder="Dave"
                 className="border-1 border-gray-400 rounded-md px-4 w-1/2 outline-none py-2 mt-2"
               />
@@ -96,10 +77,8 @@ const CaptainSignup = () => {
                 id="email"
                 type="email"
                 name="email"
-                value={email}
-                onChange={(e) => {
-                  dispatch(setEmail(e.target.value));
-                }}
+                value={captainData.email}
+                onChange={handleChange}
                 required
                 placeholder="email@example.com"
                 className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
@@ -112,11 +91,9 @@ const CaptainSignup = () => {
               <input
                 id="password"
                 type="password"
-                name="color"
-                value={password}
-                onChange={(e) => {
-                  dispatch(setPassword(e.target.value));
-                }}
+                name="password"
+                value={captainData.password}
+                onChange={handleChange}
                 placeholder="Password"
                 required
                 className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
@@ -128,37 +105,31 @@ const CaptainSignup = () => {
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <input
-                  id="color"
+                  id="vehicleColor"
                   type="text"
-                  name="color"
-                  value={vehicle.color}
-                  onChange={(e) => {
-                    dispatch(setColor(e.target.value));
-                  }}
+                  name="vehicleColor"
+                  value={captainData.vehicleColor}
+                  onChange={handleChange}
                   placeholder="Color"
                   required
                   className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
                 />
                 <input
-                  id="plate"
+                  id="vehiclePlate"
                   type="text"
-                  name="plate"
-                  value={vehicle.plate}
-                  onChange={(e) => {
-                    dispatch(setPlate(e.target.value));
-                  }}
+                  name="vehiclePlate"
+                  value={captainData.vehiclePlate}
+                  onChange={handleChange}
                   placeholder="Number"
                   required
                   className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
                 />
                 <input
-                  id="capacity"
+                  id="vehicleCapacity"
                   type="number"
-                  name="capacity"
-                  value={vehicle.capacity}
-                  onChange={(e) => {
-                    dispatch(setCapacity(e.target.value));
-                  }}
+                  name="vehicleCapacity"
+                  value={captainData.vehicleCapacity}
+                  onChange={handleChange}
                   placeholder="Capacity"
                   required
                   className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
@@ -166,10 +137,8 @@ const CaptainSignup = () => {
                 <select
                   id="vehicleType"
                   name="vehicleType"
-                  value={vehicle.vehicleType}
-                  onChange={(e) => {
-                    dispatch(setVehicleType(e.target.value));
-                  }}
+                  value={captainData.vehicleType}
+                  onChange={handleChange}
                   required
                   className="border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2"
                 >

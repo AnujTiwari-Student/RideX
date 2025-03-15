@@ -10,7 +10,7 @@ module.exports.createCaptain = async (req , res)=>{
             return res.status(400).json({errors: errors.array()})
         }
 
-        const {fullname , email , password , status , vehicle , location} = req.body;
+        const { firstname , lastname , email , password , status , vehicleColor , vehicleType , vehiclePlate , vehicleCapacity } = req.body;
 
         const captainExist = await captainModel.findOne({email})
         if(captainExist){
@@ -20,12 +20,15 @@ module.exports.createCaptain = async (req , res)=>{
         const hashedPassword = await captainModel.hashPassword(password)
 
         const captain = await captainService.createCaptain({
-            fullname,
+            firstname,
+            lastname,
             email,
             password: hashedPassword,
             status,
-            vehicle,
-            location
+            vehicleColor,
+            vehiclePlate,
+            vehicleType,
+            vehicleCapacity,
         })
 
         const token = captain.generateAuthToken();

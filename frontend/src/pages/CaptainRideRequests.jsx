@@ -1,0 +1,137 @@
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Menu } from "lucide-react";
+import Request from "@/components/Request";
+
+const AllRideRequest = () => {
+  const rideRequests = [
+    {
+      id: 1,
+      user: {
+        name: "Anuj Tiwari",
+        rating: 4.8,
+        image: "https://randomuser.me/api/portraits/men/1.jpg",
+      },
+      paymentType: "Cash",
+      fare: 25.0,
+      distance: "2.2 km",
+      pickup: {
+        address: "24B, Near Kapoors Cafe, New Delhi",
+        lat: 28.6129,
+        lng: 77.2295,
+      },
+      dropoff: {
+        address: "Connaught Place, New Delhi",
+        lat: 28.6328,
+        lng: 77.2197,
+      },
+      timestamp: "2023-07-25T10:30:00",
+    },
+    {
+      id: 2,
+      user: {
+        name: "Rahul Sharma",
+        rating: 4.5,
+        image: "https://randomuser.me/api/portraits/men/2.jpg",
+      },
+      paymentType: "Card",
+      fare: 18.5,
+      distance: "1.8 km",
+      pickup: {
+        address: "DLF Cyber City, Gurugram",
+        lat: 28.4962,
+        lng: 77.0943,
+      },
+      dropoff: {
+        address: "MG Road Metro Station, Gurugram",
+        lat: 28.4831,
+        lng: 77.0964,
+      },
+      timestamp: "2023-07-25T10:35:00",
+    },
+    {
+      id: 3,
+      user: {
+        name: "Priya Singh",
+        rating: 4.9,
+        image: "https://randomuser.me/api/portraits/women/1.jpg",
+      },
+      paymentType: "Cash",
+      fare: 32.0,
+      distance: "3.5 km",
+      pickup: {
+        address: "India Gate, New Delhi",
+        lat: 28.6129,
+        lng: 77.2295,
+      },
+      dropoff: {
+        address: "Lotus Temple, New Delhi",
+        lat: 28.5535,
+        lng: 77.2588,
+      },
+      timestamp: "2023-07-25T10:40:00",
+    },
+    {
+      id: 4,
+      user: {
+        name: "Amit Patel",
+        rating: 4.7,
+        image: "https://randomuser.me/api/portraits/men/3.jpg",
+      },
+      paymentType: "Card",
+      fare: 22.75,
+      distance: "2.7 km",
+      pickup: {
+        address: "Select Citywalk Mall, Saket",
+        lat: 28.5275,
+        lng: 77.219,
+      },
+      dropoff: {
+        address: "Hauz Khas Village, New Delhi",
+        lat: 28.5512,
+        lng: 77.1933,
+      },
+      timestamp: "2023-07-25T10:45:00",
+    },
+  ];
+
+  const navigate = useNavigate();
+
+  const [removedCard, setRemovedCard] = useState(rideRequests)
+
+  const rideRequestsList = useSelector(
+    (state) => state.rideRequestsList.rideRequestsList
+  );
+
+  console.log(removedCard);
+  
+
+  const handleRemove = (id)=>{
+    setRemovedCard((prevRequest)=> prevRequest.filter((ride)=> ride.id !== id))
+  }
+
+  useEffect(()=>{
+      if(!rideRequests.length > 1){
+          return navigate('/incoming-ride')
+      }
+  },[])
+
+  return (
+    <div className="h-screen overflow-y-scroll">
+      <div className="px-4 py-4">
+        <Menu />
+      </div>
+      <div className="bg-orange-400 py-3 flex jsutify-center text-lg text-black font-semibold px-4">
+        You have {removedCard.length} new requests.
+      </div>
+      <div className="ride-requests-container bg-gray-200">
+        {removedCard.map((ride, index) => (
+          <Request key={ride.id} rideRequestsList={rideRequestsList} index={index} ride={ride} onRemove={handleRemove} totalRequests={removedCard} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default AllRideRequest;

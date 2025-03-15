@@ -1,0 +1,181 @@
+import React, { useEffect, useRef, useState } from "react";
+import { ArrowLeft, MessageSquareMore, Phone, Trash2 } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { setRideAccepted } from "@/features/rideAcceptedSlice";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
+import MessagePanel from "./MessagePanel";
+import gsap from "gsap";
+
+const CaptainRideDetailPanel = ({
+  setRideDetailsPanel,
+  ride,
+  onRemove,
+  totalRequests,
+}) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [messagePanelOpen, setMessagePanelOpen] = useState(false);
+
+  const messagePanelRef = useRef(null);
+
+  useEffect(() => {
+    if(messagePanelOpen){
+      gsap.to(messagePanelRef.current, {
+        transform: 'translateY(0)'
+      })
+    }else{
+      gsap.to(messagePanelRef.current, {
+        transform: 'translateY(100%)'
+      })
+    }
+    }, [messagePanelOpen])
+
+  const handleIgnore = () => {
+    if (totalRequests.length > 1) {
+      onRemove(ride.id);
+      toast.success("Ride Cancelled");
+    } else {
+      onRemove(ride.id);
+      navigate("/captain/dashboard");
+      toast.success("Ride Cancelled");
+    }
+  };
+
+  return (
+    <div className="h-full overflow-scroll">
+      <div className="py-4 px-4 flex items-center gap-12">
+        <div
+          onClick={() => {
+            setRideDetailsPanel(false);
+          }}
+        >
+          <ArrowLeft />
+        </div>
+        <h2 className="text-xl font-bold">Ride Details</h2>
+      </div>
+
+      <div className="mb-4 border-2 border-gray-200"></div>
+
+      <div className="flex items-center justify-between px-4">
+        <div className="flex items-center gap-6">
+          <img
+            className="h-12 w-12 rounded-full object-cover"
+            src="https://kochhar.com/wp-content/uploads/2021/07/Anuj_Kaila-NEW02-closeup-WEB-FORMAT-.png"
+            alt="user-img"
+          />
+          <div className="flex flex-col items-start">
+            <h3 className="text-base font-bold">Anuj Tiwari</h3>
+            <p className="font-semibold text-sm text-gray-500">Cash</p>
+          </div>
+        </div>
+        <div className="flex flex-col items-end">
+          <h3 className="text-base font-bold">$100.00</h3>
+          <p className="text-sm text-gray-500 font-semibold">20.2 km</p>
+        </div>
+      </div>
+      <div className="border-[1px] border-gray-100 w-full mb-2 mt-4 px-4"></div>
+
+      <div className="w-full flex flex-col px-4">
+        <div className="flex gap-3 items-center">
+          <div className="rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0">
+            <h5 className="text-black">
+              <i className="ri-map-pin-2-fill text-md"></i>
+            </h5>
+          </div>
+          <h4 className="text-sm font-medium">
+            24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+          </h4>
+        </div>
+      </div>
+
+      <div className="border-[1px] border-gray-100 w-full mb-2 mt-4 px-4"></div>
+
+      <div className="flex gap-3 items-center px-4">
+        <div className="rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0">
+          <h5 className="text-black">
+            <i className="ri-square-fill text-md"></i>
+          </h5>
+        </div>
+        <h4 className="text-sm font-medium">
+          24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+        </h4>
+      </div>
+
+      <div className="border-[1px] border-gray-100 w-full mb-2 mt-4 px-4"></div>
+
+      <div className="px-4">
+        <p className="font-semibold text-gray-400 pb-2">Noted</p>
+        <p className="text-sm">
+          Your currentIndex is used to track which ride request is currently
+          being displayed. When the "Ignore" button is clicked, it increments
+          currentIndex, moving to the next ride request.
+        </p>
+      </div>
+
+      <div className="border-[1px] border-gray-100 w-full mb-2 mt-4 px-4"></div>
+
+      <div className="px-4">
+        <p className="font-semibold text-gray-400 pb-2">Total Fare</p>
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between items-center">
+            <p className="text-sm font-bold">Cash</p>
+            <p className="text-sm font-bold">$100.00</p>
+          </div>
+          <div className="flex justify-between items-center">
+            <p className="text-sm font-bold">Discount</p>
+            <p className="text-sm font-bold">$10.00</p>
+          </div>
+          <div className="flex justify-between items-center">
+            <p className="text-sm font-bold">Total</p>
+            <p className="text-sm font-bold">$90.00</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-[1px] border-gray-100 w-full mb-2 mt-4 px-4"></div>
+
+      <div className="flex items-center justify-between px-4 my-6">
+        <div className="flex flex-col py-3 gap-1 w-24 items-center rounded-xl bg-green-400">
+          <Phone size={20} />
+          <p className="text-sm  font-medium">Call</p>
+        </div>
+        <div onClick={()=>{
+          setMessagePanelOpen(true);
+        }} className="flex flex-col py-3 gap-1 w-24 items-center rounded-xl bg-blue-400">
+          <MessageSquareMore size={20} />
+          <p className="text-sm  font-medium">Message</p>
+        </div>
+        <div
+          onClick={() => {
+            dispatch(setRideAccepted(false));
+            setRideDetailsPanel(false);
+            handleIgnore();
+          }}
+          className="flex flex-col py-3 gap-1 w-24 items-center rounded-xl bg-gray-400"
+        >
+          <Trash2 size={20} />
+          <p className="text-sm  font-medium">Cancel</p>
+        </div>
+      </div>
+
+      <div className="border-[1px] border-gray-100 w-full mb-12 mt-4 px-4"></div>
+
+      <div className="px-4 w-full absolute bottom-2 bg-white py-2">
+        <button className="bg-orange-400 w-full flex items-center justify-center py-2 rounded-xl font-semibold text-white">
+          Pick Up
+        </button>
+      </div>
+
+      <div
+        ref={messagePanelRef}
+        className={`fixed -bottom-1 z-10 h-screen w-full bg-white rounded-t-3xl translate-y-full`}
+      >
+        <MessagePanel setMessagePanelOpen={setMessagePanelOpen} />
+      </div>
+    </div>
+  );
+};
+
+export default CaptainRideDetailPanel;

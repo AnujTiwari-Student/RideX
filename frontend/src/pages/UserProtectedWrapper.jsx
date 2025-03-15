@@ -4,7 +4,7 @@ import { Navigate , Outlet } from 'react-router';
 
 const UserProtectedWrapper = () => {
 
-    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+    const {isAuthenticated} = useSelector((state) => state.user);
 
     if(!isAuthenticated){
         return <Navigate to='/login' replace />

@@ -1,69 +1,80 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 const initialState = {
-    fullname: {
-        firstname: '',
-        lastname: ''
-    },
-    email: '',
-    password: '',
-    status: "inactive",
-    vehicle: {
-        color: '',
-        plate: '',
-        capacity: '',
-        vehicleType: ''
-    },
-    location: {
-        lat: "",
-        lng: "",
-    },
-    serverResponse: null,
+    captain: null,
+    loading: true,
+    error: null,
+    isAuthenticated: false,
 }
+
+export const captainLogin = createAsyncThunk (
+    'captain/captainLogin',
+    async (captainData , {rejectWithValue}) => {
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/login` , captainData)
+            const token = res.data.token;
+            localStorage.setItem('captainToken', token);
+            return res.data;
+        }catch (e) {
+            return rejectWithValue(e.response.data)
+        }
+})
+
+export const createCaptain = createAsyncThunk (
+    'captain/createCaptain',
+    async (captainData , {rejectWithValue}) => {
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/register` , captainData)
+            const token = res.data.token;
+            localStorage.setItem('captainToken', token);
+            return res.data;
+        }catch (e) {
+            return rejectWithValue(e.response.data)
+        }
+})
 
 export const captainSlice = createSlice({
     name: 'captain',
     initialState,
-    reducers: {
-        setFirstName: (state, action) => {
-            state.fullname.firstname = action.payload
-        },
-        setLastName: (state, action) => {
-            state.fullname.lastname = action.payload
-        },
-        setEmail: (state, action) => {
-            state.email = action.payload;
-        },
-        setPassword: (state, action) => {
-            state.password = action.payload;
-        },
-        setStatus: (state, action) => {
-            state.status = action.payload;
-        },
-        setColor: (state, action) => {
-            state.vehicle.color = action.payload;
-        },
-        setPlate: (state, action) => {
-            state.vehicle.plate = action.payload;
-        },
-        setCapacity: (state, action) => {
-            state.vehicle.capacity = action.payload;
-        },
-        setVehicleType: (state, action) => {
-            state.vehicle.vehicleType = action.payload;
-        },
-        setLat: (state, action) => {
-            state.location.lat = action.payload;
-        },
-        setLng: (state, action) => {
-            state.location.lng = action.payload;
-        },
-        setServerResponse: (state, action) => {
-            state.serverResponse = action.payload;
-        },
-    },
+    reducers: {},
+    extraReducers: (builder)=>{
+        builder.addCase(captainLogin.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+            state.captain = null;
+        });
+        builder.addCase(captainLogin.fulfilled, (state, action) => {
+            state.loading = false;
+            state.captain = action.payload;
+            state.error = null;
+            state.isAuthenticated = true;
+        });
+        builder.addCase(captainLogin.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+            state.isAuthenticated = false;
+            state.captain = null;
+        });
+        builder.addCase(createCaptain.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+            state.captain = null;
+        });
+        builder.addCase(createCaptain.fulfilled, (state, action) => {
+            state.loading = false;
+            state.captain = action.payload;
+            state.error = null;
+            state.isAuthenticated = true;
+        });
+        builder.addCase(createCaptain.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+            state.isAuthenticated = false;
+            state.captain = null;
+        })
+    }
 });
 
-export const {setFirstName , setLastName , setEmail, setPassword, setStatus, setColor , setCapacity , setPlate , setVehicleType, setLat , setLng, setServerResponse} = captainSlice.actions;
-
-export default captainSlice.reducer;
+const captainReducer = captainSlice.reducer
+export default captainReducer;;

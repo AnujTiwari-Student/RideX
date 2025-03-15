@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom'
 
 const CaptainAuthWrapper = () => {
 
-    const isAuthenticated = useSelector((state) => state.captainAuth.isAuthenticated);
+    const {isAuthenticated} = useSelector((state) => state.captain);
 
     if(!isAuthenticated){
         return <Navigate to='/captain-login' replace />

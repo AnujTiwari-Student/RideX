@@ -54,8 +54,8 @@ const Account = () => {
       {
         ref: driverFoundRef,
         state: driverFound,
-        animation: { transform: "translateY(0)" },
-        reverse: { transform: "translateY(100%)" },
+        animation: { transform: "translateY(100%)" },
+        reverse: { transform: "translateY(0)" },
       },
       {
         ref: lookingForDriverRef,
@@ -145,7 +145,7 @@ const Account = () => {
       <div ref={lookingForDriverRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}>
         <LookingForDriver />
       </div>
-      <div ref={driverFoundRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl`}>
+      <div ref={driverFoundRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}>
         <DriverFound driverFound={setDriverFound} />
       </div>
     </div>

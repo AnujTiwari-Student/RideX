@@ -1,69 +1,49 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch , useSelector } from 'react-redux'
-import { setEmail , setPassword } from '../features/captainSlice'
-import axios from 'axios'
-import { loginSuccess } from '../features/captainAuthSlice'
+import { captainLogin } from '@/features/captainSlice'
+import toast from 'react-hot-toast'
 
 const CaptainLogin = () => {
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const {email , password} = useSelector(state => state.captain)
+  const {loading} = useSelector((state) => state.captain);
 
-  const formHandler = async (e) => {
-    e.preventDefault()
-    const captain = {
-      email: email.trim(),
-      password: password.trim()
-    }
+  const [captainData, setCaptainData] = useState({
+    email: '',
+    password: ''
+  })
 
-    try{
-      console.log("Sending login request:", captain)
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/login`, captain)
-      console.log("Backend response:", response)
+  const handleChange = (event)=>{
+    setCaptainData({ ...captainData, [event.target.name]: event.target.value })
+  }
 
-      localStorage.setItem("captainToken", response.data.token)
-      dispatch(loginSuccess({token: response.data.token}))
-
-      if (response.status === 200) {
-        console.log("Login successful, navigating to /captain-account")
-        navigate("/captain-account")
-        console.log("Resetting form fields...")
-        dispatch(setEmail(""))
-        dispatch(setPassword(""))
-      }
-    }catch(error){
-      console.error("Error during login:", error)
-      if (error.response) {
-        console.error("Response data:", error.response.data)
-        console.error("Response status:", error.response.status)
-      } else if (error.request) {
-        console.error("No response received:", error.request)
-      } else {
-        console.error("Error message:", error.message)
-      }
-    }
-
+  const handleSubmit = (event)=>{
+    event.preventDefault()
+    dispatch(captainLogin(captainData))
+    .unwrap().then((res)=>{
+      navigate('/captain-dashboard')
+      toast.success('Login Successful')
+    }).catch(err => {
+      toast.error('Failed to log in, please check your credentials')
+      console.log(err);
+    })
   }
 
   return (
     <>
       <div className='flex h-screen justify-between flex-col'>
         <div className='container pt-10 px-6'>
-          <form action="" onSubmit={formHandler}>
+          <form action="" onSubmit={handleSubmit}>
             <div className='mb-4'>
                 <label htmlFor='email' className='text-xl font-semibold'>What's our Captain email address</label>
-                <input id='email' type="email" name="email" value={email} onChange={(e)=>{
-                  dispatch(setEmail(e.target.value))
-                }} required placeholder='email@example.com' className='border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2' />
+                <input id='email' type="email" name="email" value={captainData.email} onChange={handleChange} required placeholder='email@example.com' className='border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2' />
             </div>
             <div className='mb-6'>
                 <label htmlFor='password' className='text-xl font-semibold'>Enter password</label>
-                <input id='password' type="password" name="password" value={password} onChange={(e)=>{
-                  dispatch(setPassword(e.target.value))
-                }} placeholder='Password' required className='border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2' />
+                <input id='password' type="password" name="password" value={captainData.password} onChange={handleChange} placeholder='Password' required className='border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2' />
             </div>
             <button className='bg-black w-full rounded-md font-semibold tracking-wider text-center text-white py-[8px]'>Login</button>
           </form>
