@@ -8,13 +8,12 @@ import CaptainSignup from './pages/CaptainSignup'
 import Account from './pages/Account'
 import CaptainAccount from './pages/CaptainAccount'
 import UserProtectedWrapper from './pages/UserProtectedWrapper'
-import UserLogout from './pages/UserLogout'
 import CaptainAuthWrapper from './pages/CaptainAuthWrapper'
-import CaptainLogout from './pages/CaptainLogout'
 import UserRideDetails from './pages/UserRideDetails'
 import PaymentMethod from './pages/PaymentMethod'
 import StripePayment from './pages/StripePayment'
 import CaptainRideRequests from './pages/CaptainRideRequests'
+import PickupRide from './pages/PickupRide'
 
 const App = () => {
   return (
@@ -28,7 +27,6 @@ const App = () => {
 
         <Route element={<UserProtectedWrapper />}>
           <Route path='/account' element={<Account />} />
-          <Route path='/user/logout' element={<UserLogout />} />
           <Route path='/ride-details' element={<UserRideDetails />} />
           <Route path='/user/payment-method' element={<PaymentMethod />} />
           <Route path='/user/checkout/stripe' element={<StripePayment />} />
@@ -37,7 +35,7 @@ const App = () => {
         <Route element={<CaptainAuthWrapper />}>
           <Route path='/captain/dashboard' element={<CaptainAccount />} />
           <Route path='/captain/ride-requests' element={<CaptainRideRequests />} />
-          <Route path='/captain/logout' element={<CaptainLogout />} />
+          <Route path='/captain/pickup-in-progress' element={<PickupRide />} />
         </Route>
       </Routes>
     </div>

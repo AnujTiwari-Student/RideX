@@ -22,6 +22,26 @@ export const loginUser = createAsyncThunk(
     }
 )
 
+export const logoutUser = createAsyncThunk(
+    'user/logoutUser',
+    async (_, {rejectWithValue}) => {
+        try {
+            const token =localStorage.getItem('token')
+            if (!token) {
+                throw new Error("No token found");
+              }
+            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/logout`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return res.data
+        } catch (error) {
+           return rejectWithValue(error.response.data); 
+        }
+    }
+)
+
 export const createUser = createAsyncThunk(
     'user/createUser',
     async (userData, {rejectWithValue}) => {
@@ -72,7 +92,21 @@ export const userSlice = createSlice({
             state.loading = false
             state.error = action.payload
             state.user = null
+        });
+        builder.addCase(logoutUser.pending, (state) => {
+            state.loading = true; 
+            state.error = null; 
         })
+        .addCase(logoutUser.fulfilled, (state) => {
+            localStorage.removeItem('token'); 
+            state.loading = false; 
+            state.user = null; 
+            state.isAuthenticated = false; 
+        })
+        .addCase(logoutUser.rejected, (state, action) => {
+            state.loading = false; 
+            state.error = action.payload;
+        });
     }
     
 })

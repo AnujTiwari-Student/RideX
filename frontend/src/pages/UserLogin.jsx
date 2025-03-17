@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Link , useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginUser } from '../features/userSlice'
 import toast from 'react-hot-toast'
+import { Loader } from 'lucide-react'
+import gsap from 'gsap'
 
 const UserLogin = () => {
 
@@ -10,6 +12,8 @@ const UserLogin = () => {
   const dispatch = useDispatch()
 
   const {loading} = useSelector((state) => state.user);
+
+  const loaderRef = useRef(null);
 
   const [userData, setUserData] = useState({
     email:"",
@@ -19,6 +23,20 @@ const UserLogin = () => {
   const handleChange = (e) => {
     setUserData({...userData, [e.target.name]: e.target.value })
   }
+
+  React.useEffect(() => {
+      if (loading) {
+        gsap.to(loaderRef.current, {
+          rotation: 360,
+          duration: 1,
+          repeat: -1,
+          ease: "linear",
+        });
+      } else {
+        gsap.killTweensOf(loaderRef.current);
+        gsap.set(loaderRef.current, { rotation: 0 });
+      }
+    }, [loading]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -49,7 +67,13 @@ const UserLogin = () => {
                 <label htmlFor='password' className='text-xl font-semibold'>Enter password</label>
                 <input id='password' type="password" name="password" value={userData.password} onChange={handleChange} placeholder='Password' required className='border-1 border-gray-400 rounded-md px-4 w-full outline-none py-2 mt-2' />
             </div>
-            <button className='bg-black w-full rounded-md font-semibold tracking-wider text-center text-white py-[8px]'>Login</button>
+            <button className='bg-black w-full rounded-md font-semibold tracking-wider text-center text-white py-[8px]'>
+              {loading ? (
+                <div className='flex w-full items-center justify-center'>
+                  <Loader ref={loaderRef} size={24} />
+                </div>
+              ): 'Login'}
+            </button>
           </form>
           <p className='text-center mt-4 font-medium text-base'>New Here ? <Link to="/signup" className='text-blue-500'>Create Account</Link></p>
         </div>

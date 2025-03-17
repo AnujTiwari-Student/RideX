@@ -11,11 +11,13 @@ import rideRequestReducer from '../features/rideRequestSlice'
 import rideRequestsListReducer from '../features/rideRequestsListSlice'
 import rideAcceptedReducer from '../features/rideAcceptedSlice'
 import { combineReducers } from 'redux'
+import otpVerificationReducer from '../features/OTPVerificationSlice'
+import driverReachedReducer from '../features/driverReachedSlice'
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user', 'captain', 'captainAuth' , 'rideAccepted'], 
+  whitelist: ['user', 'captain', 'captainAuth' , 'rideAccepted' , 'otpVerification' , 'driverReached'], 
 }
 
 const rootReducer = combineReducers({
@@ -28,6 +30,8 @@ const rootReducer = combineReducers({
   rideRequest: rideRequestReducer,
   rideRequestsList: rideRequestsListReducer,
   rideAccepted: rideAcceptedReducer,
+  otpVerification: otpVerificationReducer,
+  driverReached: driverReachedReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

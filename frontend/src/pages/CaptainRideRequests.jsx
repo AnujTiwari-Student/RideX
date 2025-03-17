@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 import Request from "@/components/Request";
+import CaptainNavBar from "@/components/CaptainNavBar";
+import gsap from "gsap";
 
 const AllRideRequest = () => {
   const rideRequests = [
@@ -111,6 +113,26 @@ const AllRideRequest = () => {
     setRemovedCard((prevRequest)=> prevRequest.filter((ride)=> ride.id !== id))
   }
 
+  const [menuOpen, setMenuOpen] = useState(false)
+  
+    const menuRef = useRef(null);
+  
+    useEffect(() => {
+      if (menuOpen) {
+        gsap.to(menuRef.current, {
+          x: 0, 
+          duration: 0.3,
+          ease: "power2.out", 
+        });
+      } else {
+        gsap.to(menuRef.current, {
+          x: "-100%",
+          duration: 0.3,
+          ease: "power2.out",
+        });
+      }
+    }, [menuOpen]);
+
   useEffect(()=>{
       if(!rideRequests.length > 1){
           return navigate('/incoming-ride')
@@ -119,7 +141,9 @@ const AllRideRequest = () => {
 
   return (
     <div className="h-screen overflow-y-scroll">
-      <div className="px-4 py-4">
+      <div onClick={()=>{
+          setMenuOpen(true)
+        }} className="px-4 py-4 w-max">
         <Menu />
       </div>
       <div className="bg-orange-400 py-3 flex jsutify-center text-lg text-black font-semibold px-4">
@@ -129,6 +153,12 @@ const AllRideRequest = () => {
         {removedCard.map((ride, index) => (
           <Request key={ride.id} rideRequestsList={rideRequestsList} index={index} ride={ride} onRemove={handleRemove} totalRequests={removedCard} />
         ))}
+      </div>
+      <div
+        ref={menuRef}
+        className={`fixed top-0 left-0 z-10 w-[80%] bg-white h-full translate-x-full`}
+      >
+        <CaptainNavBar setMenuOpen={setMenuOpen} />
       </div>
     </div>
   );

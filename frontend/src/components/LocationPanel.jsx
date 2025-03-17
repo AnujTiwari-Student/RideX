@@ -13,7 +13,7 @@ const LocationPanel = (props) => {
     ]
 
   return (
-    <div className=''>
+    <div className='mt-4'>
       {location.map((function(elem , index){
         return <div key={index} onClick={()=>{
             props.setVehiclePanel(true)

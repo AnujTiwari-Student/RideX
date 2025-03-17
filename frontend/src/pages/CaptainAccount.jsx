@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Gauge,
   Timer,
+  Menu,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -17,51 +18,58 @@ import mapImage from "../assets/image/Map.jpeg";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import IncomingRide from "@/components/IncomingRidePanel";
+import CaptainNavBar from "@/components/CaptainNavBar";
+import { transform } from "framer-motion";
 
 const CaptainAccount = () => {
   
   const paymentMethod = useSelector((state) => state.payment.paymentMethod);
   const rideRequestsList = useSelector((state) => state.rideRequestsList.rideRequestsList);
 
-  const CaptainDetainRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false)
 
-  const [captainDetail, setCaptainDetail] = useState(true);
+  const menuRef = useRef(null);
 
   useEffect(() => {
-    if (captainDetail) {
-      gsap.to(CaptainDetainRef.current, {
-        transform: "translateY(0)",
+    if (menuOpen) {
+      gsap.to(menuRef.current, {
+        x: 0, 
+        duration: 0.3,
+        ease: "power2.out", 
       });
     } else {
-      gsap.to(CaptainDetainRef.current, {
-        transform: "translateY(-100%)",
+      gsap.to(menuRef.current, {
+        x: "-100%",
+        duration: 0.3,
+        ease: "power2.out",
       });
     }
-  }, [captainDetail]);
+  }, [menuOpen]);
 
   return (
     <div className="h-screen">
-      <div className="px-10 py-5 h-72 w-62 absolute -left-12 -top-28 overflow-hidden">
-        <img
-          src={logo}
-          alt="logo"
-          className="h-full w-full drop-shadow-lg logo-img z-50"
-        />
-      </div>
-      <div className="h-full w-screen">
-        <img
-          className="h-full w-full object-cover"
-          src={mapImage}
-          alt="map-image"
-        />
+
+      <div style={{backgroundImage: `url(${mapImage})`}} className="h-full w-screen bg-cover bg-center py-2 px-4">
+        <div onClick={()=>{
+          setMenuOpen(true)
+        }} className="bg-transparent p-3 rounded-full w-max cursor-pointer">
+          <Menu />
+        </div>
       </div>
 
       <div
-        ref={CaptainDetainRef}
-        className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}
+        className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl`}
       >
         <CaptainDetail rideRequestsList={rideRequestsList} paymentMethod={paymentMethod} />
       </div>
+
+      <div
+        ref={menuRef}
+        className={`fixed top-0 left-0 z-10 w-[80%] bg-white h-full translate-x-full`}
+      >
+        <CaptainNavBar setMenuOpen={setMenuOpen} />
+      </div>
+
     </div>
   );
 };

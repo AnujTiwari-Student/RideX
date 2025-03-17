@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import '../App.css'
-import logo from "../assets/logo/logo.jpeg"
+import mapImage from '../assets/image/Map.jpeg'
 import { useDispatch, useSelector } from 'react-redux'
 import { setDestination, setPickup } from '../features/userLocationSlice'
 import gsap from 'gsap'
-import {useGSAP} from '@gsap/react'
 import 'remixicon/fonts/remixicon.css'
 import { useNavigate } from 'react-router-dom'
 import LocationPanel from '../components/LocationPanel'
@@ -12,6 +11,8 @@ import VehiclePanel from '../components/VehiclePanel'
 import SelectedVehiclePanel from '../components/SelectedVehiclePanel'
 import LookingForDriver from '../components/LookingForDriver'
 import DriverFound from '../components/DriverFound'
+import { Flag, Menu } from 'lucide-react'
+import UserNavBar from '@/components/UserNavBar'
 
 const Account = () => {
   const dispatch = useDispatch()
@@ -23,6 +24,7 @@ const Account = () => {
   const [selectedVehiclePanel, setSelectedVehiclePanel] = useState(false)
   const [lookingForDriver, setLookingForDriver] = useState(false)
   const [driverFound, setDriverFound] = useState(true)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const panelCloseRef = useRef(null)
   const panelRef = useRef(null)
@@ -30,6 +32,23 @@ const Account = () => {
   const selectedVehicleRef = useRef(null)
   const lookingForDriverRef = useRef(null)
   const driverFoundRef = useRef(null)
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+      if (menuOpen) {
+        gsap.to(menuRef.current, {
+          x: 0, 
+          duration: 0.3,
+          ease: "power2.out", 
+        });
+      } else {
+        gsap.to(menuRef.current, {
+          x: "-100%",
+          duration: 0.3,
+          ease: "power2.out",
+        });
+      }
+    }, [menuOpen]);
 
   useEffect(() => {
     const animations = [
@@ -84,14 +103,15 @@ const Account = () => {
   }
 
   return (
-    <div className='h-screen relative overflow-hidden'>
-      <div className='px-10 py-5 h-72 w-62 absolute -left-12 -top-28 overflow-hidden'>
-        <img src={logo} alt="logo" className='h-full w-full drop-shadow-lg logo-img z-50' />
+    <div className='h-screen relative'>
+      <div style={{backgroundImage: `url(${mapImage})`}} className="h-full w-screen bg-cover bg-center py-2 px-4">
+        <div onClick={()=>{
+          setMenuOpen(true)
+        }} className="bg-transparent p-3 rounded-full w-max cursor-pointer z-[1050] relative">
+          {panelOpen ? null : <Menu />}
+        </div>
       </div>
-      <div className='h-screen w-screen'>
-        <img className='h-full w-full object-cover' src="https://i2-prod.mylondon.news//article16106961.ece/ALTERNATES/s1200b/2_Uber-pink-cars.jpg" alt="map-image" />
-      </div>
-      <div className='h-screen absolute top-0 w-full flex flex-col justify-end'>
+      <div className='h-screen fixed bottom-0 w-full flex flex-col justify-end'>
         <div className={`${panelOpen ? "h-[32%]" : "h-[35%]"} bg-white p-5 relative ${!panelOpen ? "rounded-t-3xl" : ""}`}>
           <div className='flex justify-between items-center'>
             <h4 className='text-xl font-semibold'>{panelOpen ? "Plan A Trip" : "Find A Trip"}</h4>
@@ -147,6 +167,12 @@ const Account = () => {
       </div>
       <div ref={driverFoundRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}>
         <DriverFound driverFound={setDriverFound} />
+      </div>
+      <div
+        ref={menuRef}
+        className={`fixed top-0 left-0 w-[80%] z-[2000] bg-white h-full translate-x-full`}
+      >
+        <UserNavBar setMenuOpen={setMenuOpen} />
       </div>
     </div>
   )

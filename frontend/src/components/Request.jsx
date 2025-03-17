@@ -69,13 +69,13 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
             <div className="flex flex-col items-start gap-1">
               <h3 className="text-lg font-bold">{ride.user.name}</h3>
               <div className="bg-yellow-400 flex items-center justify-center px-8 rounded-xl">
-                <p className="font-bold text-sm">Cash</p>
+                <p className="font-bold text-sm">{ride.paymentType}</p>
               </div>
             </div>
           </div>
           <div className="flex flex-col items-end">
-            <h3 className="text-lg font-bold">$25.00</h3>
-            <p className="text-sm">2.2 km</p>
+            <h3 className="text-lg font-bold">${ride.fare}</h3>
+            <p className="text-sm">{ride.distance}</p>
           </div>
         </div>
         <div className="border-[1px] border-gray-100 w-full mb-2 mt-4 px-4"></div>
@@ -88,7 +88,7 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
               </h5>
             </div>
             <h4 className="text-base font-medium">
-              24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+              {ride?.pickup?.address}
             </h4>
           </div>
         </div>
@@ -102,7 +102,7 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
             </h5>
           </div>
           <h4 className="text-base font-medium">
-            24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+          {ride?.dropoff?.address}
           </h4>
         </div>
       </div>

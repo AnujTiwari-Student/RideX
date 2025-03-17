@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft, MessageSquareMore, Phone, Trash2 } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setRideAccepted } from "@/features/rideAcceptedSlice";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import MessagePanel from "./MessagePanel";
 import gsap from "gsap";
 
@@ -15,6 +15,8 @@ const CaptainRideDetailPanel = ({
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const {otpSubmitted} = useSelector((state) => state.otpVerification);
 
   const [messagePanelOpen, setMessagePanelOpen] = useState(false);
 
@@ -136,7 +138,8 @@ const CaptainRideDetailPanel = ({
 
       <div className="border-[1px] border-gray-100 w-full mb-2 mt-4 px-4"></div>
 
-      <div className="flex items-center justify-between px-4 my-6">
+      {!otpSubmitted && (
+        <div className="flex items-center justify-between px-4 my-6">
         <div className="flex flex-col py-3 gap-1 w-24 items-center rounded-xl bg-green-400">
           <Phone size={20} />
           <p className="text-sm  font-medium">Call</p>
@@ -159,13 +162,14 @@ const CaptainRideDetailPanel = ({
           <p className="text-sm  font-medium">Cancel</p>
         </div>
       </div>
+      )}
 
-      <div className="border-[1px] border-gray-100 w-full mb-12 mt-4 px-4"></div>
+      {!otpSubmitted && <div className="border-[1px] border-gray-100 w-full mb-12 mt-4 px-4"></div>}
 
       <div className="px-4 w-full absolute bottom-2 bg-white py-2">
-        <button className="bg-orange-400 w-full flex items-center justify-center py-2 rounded-xl font-semibold text-white">
+        <Link to='/captain/pickup-in-progress' className="bg-orange-400 w-full flex items-center justify-center py-2 rounded-xl font-semibold text-white">
           Pick Up
-        </button>
+        </Link>
       </div>
 
       <div
