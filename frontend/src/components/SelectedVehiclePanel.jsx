@@ -1,4 +1,6 @@
+import { ChevronRight } from 'lucide-react'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
   return (
@@ -18,7 +20,7 @@ const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
             <div className='rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0'>
                 <h5 className='text-black'><i className="ri-map-pin-2-fill text-xl"></i></h5>
             </div>
-            <h4 className='text-xl font-base'>
+            <h4 className='text-lg font-semibold'>
                 24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
             </h4>
         </div>
@@ -26,7 +28,7 @@ const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
             <div className='rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0'>
                 <h5 className='text-black'><i className="ri-square-fill text-xl"></i></h5>
             </div>
-            <h4 className='text-xl font-base'>
+            <h4 className='text-lg font-semibold'>
                 24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
             </h4>
         </div>
@@ -34,13 +36,19 @@ const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
             <div className='rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0'>
                 <h5 className='text-black'><i className="ri-bank-card-2-fill text-xl"></i></h5>
             </div>
-            <div className='flex flex-col'>
-                <h4 className='text-xl font-semibold'>
-                    $99
-                </h4>
-                <p className='font-medium text-gray-600'>
-                    Cash Cash
-                </p>
+            <div className='flex justify-between items-end w-full'>
+                <div className='flex flex-col'>
+                  <h4 className='text-xl font-semibold'>
+                      $99
+                  </h4>
+                  <p className='font-medium text-gray-600'>
+                      Cash Cash
+                  </p>
+                </div>
+                {/* <Link to='/user/payment-method'>
+                  <ChevronRight />
+                </Link> */}
+                <h6 className='text-xs text-gray-800'>Can be change later</h6>
             </div>
         </div>
         <button onClick={()=>{

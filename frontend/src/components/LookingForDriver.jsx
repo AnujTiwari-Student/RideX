@@ -16,7 +16,7 @@ const LookingForDriver = () => {
             <div className='rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0'>
                 <h5 className='text-black'><i className="ri-map-pin-2-fill text-xl"></i></h5>
             </div>
-            <h4 className='text-xl font-base'>
+            <h4 className='text-lg font-semibold'>
                 24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
             </h4>
         </div>
@@ -24,7 +24,7 @@ const LookingForDriver = () => {
             <div className='rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0'>
                 <h5 className='text-black'><i className="ri-square-fill text-xl"></i></h5>
             </div>
-            <h4 className='text-xl font-base'>
+            <h4 className='text-lg font-semibold'>
                 24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
             </h4>
         </div>

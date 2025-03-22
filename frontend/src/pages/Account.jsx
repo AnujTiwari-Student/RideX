@@ -55,7 +55,7 @@ const Account = () => {
       {
         ref: panelRef,
         state: panelOpen,
-        animation: { height: "68%", paddingLeft: 24, paddingRight: 24 },
+        animation: { height: "70%", paddingLeft: 24, paddingRight: 24 },
         reverse: { height: "0%", paddingLeft: 0, paddingRight: 0 },
       },
       {
@@ -112,7 +112,7 @@ const Account = () => {
         </div>
       </div>
       <div className='h-screen fixed bottom-0 w-full flex flex-col justify-end'>
-        <div className={`${panelOpen ? "h-[32%]" : "h-[35%]"} bg-white p-5 relative ${!panelOpen ? "rounded-t-3xl" : ""}`}>
+        <div className={`${panelOpen ? "h-[30%]" : "h-[35%]"} bg-white p-5 relative ${!panelOpen ? "rounded-t-3xl" : ""}`}>
           <div className='flex justify-between items-center'>
             <h4 className='text-xl font-semibold'>{panelOpen ? "Plan A Trip" : "Find A Trip"}</h4>
             {panelOpen ? <div className='rounded-3xl bg-gray-200 py-3 px-5 w-max'>
@@ -148,9 +148,6 @@ const Account = () => {
               />
             </div>
           </form>
-          {panelOpen ? null : <div className='rounded-3xl bg-gray-200 py-3 px-5 w-max'>
-              <h5><i className="ri-timer-line"></i> Leave Now <i className="ri-arrow-down-s-line"></i></h5>
-          </div>}
         </div>
         <div ref={panelRef} className='overflow-hidden bg-white'>
           <LocationPanel setPanelOpen={setPanelOpen} setVehiclePanel={setVehiclePanel} />
@@ -159,7 +156,7 @@ const Account = () => {
       <div ref={vehiclePanelRef} className={`fixed bottom-0 z-10 w-full p-3 bg-white rounded-t-3xl translate-y-full`}>
         <VehiclePanel selectedVehiclePanel={setSelectedVehiclePanel} setVehiclePanel={setVehiclePanel} />
       </div>
-      <div ref={selectedVehicleRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}>
+      <div ref={selectedVehicleRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-4xl shadow-2xl translate-y-full`}>
         <SelectedVehiclePanel selectedVehiclePanel={setSelectedVehiclePanel} lookingForDriver={setLookingForDriver} />
       </div>
       <div ref={lookingForDriverRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}>

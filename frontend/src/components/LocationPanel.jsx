@@ -13,16 +13,16 @@ const LocationPanel = (props) => {
     ]
 
   return (
-    <div className='mt-4'>
+    <div className='mt-8'>
       {location.map((function(elem , index){
         return <div key={index} onClick={()=>{
             props.setVehiclePanel(true)
             props.setPanelOpen(false)
         }} className='flex gap-4 items-center mb-4'>
-        <div className='rounded-full h-10 w-10 bg-gray-400 flex items-center justify-center flex-shrink-0'>
+        <div className='rounded-full h-8 w-8 bg-gray-400 flex items-center justify-center flex-shrink-0'>
             <h5 className='text-white'><i className="ri-building-3-line"></i></h5>
         </div>
-        <h4 className='text-lg'>
+        <h4 className='text-base font-semibold'>
             {elem}
         </h4>
       </div>

@@ -1,14 +1,31 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Phone, Map, Shield, Star , SendHorizontal , ChevronRight , House } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import gsap from "gsap";
+import MessagePanel from "@/components/MessagePanel";
 
 const Riding = () => {
 
   const paymentMethod = useSelector((state)=> state.payment.paymentMethod)
+  const [messagePanelOpen, setMessagePanelOpen] = useState(false);
+
+  const messagePanelRef = useRef(null);
+
+  useEffect(() => {
+    if(messagePanelOpen){
+      gsap.to(messagePanelRef.current, {
+        transform: 'translateY(0)'
+      })
+    }else{
+      gsap.to(messagePanelRef.current, {
+        transform: 'translateY(100%)'
+      })
+    }
+    }, [messagePanelOpen])
 
   return (
-    <div className="h-screen">
+    <div className="h-screen p-0 m-0">
       <Link to='/account' className="flex items-center justify-center bg-white rounded-full p-4 absolute top-2 right-2">
           <House />
       </Link>
@@ -54,8 +71,9 @@ const Riding = () => {
               type="text"
               placeholder="Send Message...."
               className="px-4 py-1 outline-none w-[90%]"
-              onChange={(e) => {
-                setMessage(e.target.value);
+              onFocus={(e) => {
+                e.preventDefault();
+                setMessagePanelOpen(true);
               }}
             />
             <button className="absolute right-4 text-gray-600 hover:text-gray-800">
@@ -76,7 +94,7 @@ const Riding = () => {
                 <i className="ri-square-fill text-xl"></i>
               </h5>
             </div>
-            <h4 className="text-xl font-base">
+            <h4 className="text-lg font-semibold">
               24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
             </h4>
           </div>
@@ -105,6 +123,12 @@ const Riding = () => {
             Pay Now
           </button>
         )}
+      </div>
+      <div
+        ref={messagePanelRef}
+        className={`fixed -bottom-1 z-10 h-screen w-full bg-white rounded-t-3xl translate-y-full`}
+      >
+        <MessagePanel setMessagePanelOpen={setMessagePanelOpen} />
       </div>
     </div>
   );
