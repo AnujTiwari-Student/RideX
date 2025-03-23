@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import '../App.css'
 import mapImage from '../assets/image/Map.jpeg'
 import { useDispatch, useSelector } from 'react-redux'
-import { setDestination, setPickup } from '../features/userLocationSlice'
+import { locationSuggestion, setDestination, setPickup } from '../features/userLocationSlice'
 import gsap from 'gsap'
 import 'remixicon/fonts/remixicon.css'
 import { useNavigate } from 'react-router-dom'
@@ -13,10 +13,10 @@ import LookingForDriver from '../components/LookingForDriver'
 import DriverFound from '../components/DriverFound'
 import { Flag, Menu } from 'lucide-react'
 import UserNavBar from '@/components/UserNavBar'
+import axios from 'axios'
 
 const Account = () => {
   const dispatch = useDispatch()
-  const { pickup, destination } = useSelector((state) => state.userLocation)
   const navigate = useNavigate();
   
   const [panelOpen, setPanelOpen] = useState(false)
@@ -25,6 +25,24 @@ const Account = () => {
   const [lookingForDriver, setLookingForDriver] = useState(false)
   const [driverFound, setDriverFound] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [focusField, setFocusField] = useState(null)
+
+  const {rideFare} = useSelector((state) => state.rideRequestsList)
+  console.log(`Fare: ${rideFare}`)
+
+  const [userLocation, setUserLocation] = useState({
+    pickup: "",
+    destination: "",
+    locationSuggestion: "",
+  })
+
+  const handleChange = (e) => {
+    setUserLocation({
+      ...userLocation,
+      [e.target.name]: e.target.value
+    })
+    dispatch(locationSuggestion( e.target.value ));
+  }
 
   const panelCloseRef = useRef(null)
   const panelRef = useRef(null)
@@ -34,7 +52,7 @@ const Account = () => {
   const driverFoundRef = useRef(null)
   const menuRef = useRef(null)
 
-  useEffect(() => {
+  useEffect(() => { 
       if (menuOpen) {
         gsap.to(menuRef.current, {
           x: 0, 
@@ -97,9 +115,11 @@ const Account = () => {
     });
   }, [panelOpen, vehiclePanel, driverFound, lookingForDriver, selectedVehiclePanel]);
 
-  const submitHandler = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('submitted')
+    console.log('Form Submitted')
+    dispatch(setPickup(userLocation.pickup))
+    dispatch(setDestination(userLocation.destination))
   }
 
   return (
@@ -122,16 +142,20 @@ const Account = () => {
               <i className={`ri-arrow-${panelOpen ? "down" : "up"}-wide-line`}></i>
             </h5>
           </div>
-          <form onSubmit={submitHandler}>
+          <form onSubmit={handleSubmit}>
             <div className="relative flex flex-col space-y-3 my-4">
               {/* Vertical Line */}
               <div className="absolute h-[65px] left-6 top-0 bottom-0 w-1 bg-gray-700 rounded-full z-5 my-auto"></div>
 
               {/* Pickup Input */}
               <input
-                value={pickup}
-                onFocus={() => setPanelOpen(true)}
-                onChange={(e) => dispatch(setPickup(e.target.value))}
+                name="pickup"
+                value={userLocation.pickup}
+                onFocus={() => {
+                  setPanelOpen(true);
+                  setFocusField("pickup")
+                }}
+                onChange={handleChange}
                 className="bg-[#eee] rounded-md py-4 px-14 outline-none"
                 type="text"
                 placeholder="Add a pickup location"
@@ -139,9 +163,14 @@ const Account = () => {
 
               {/* Destination Input */}
               <input
-                value={destination}
-                onFocus={() => setPanelOpen(true)}
-                onChange={(e) => dispatch(setDestination(e.target.value))}
+                name="destination"
+                value={userLocation.destination}
+                onFocus={() => {
+                  setPanelOpen(true);
+                  setFocusField("destination");
+                  
+                }}
+                onChange={handleChange}
                 className="bg-[#eee] rounded-md py-4 px-14 outline-none"
                 type="text"
                 placeholder="Enter your destination"
@@ -149,12 +178,12 @@ const Account = () => {
             </div>
           </form>
         </div>
-        <div ref={panelRef} className='overflow-hidden bg-white'>
-          <LocationPanel setPanelOpen={setPanelOpen} setVehiclePanel={setVehiclePanel} />
+        <div ref={panelRef} className='bg-white'>
+          <LocationPanel setPanelOpen={setPanelOpen} panelOpen={panelOpen} setVehiclePanel={setVehiclePanel} setUserLocation={setUserLocation} focusField={focusField} handleSubmit={handleSubmit} userLocation={userLocation} />
         </div>
       </div>
       <div ref={vehiclePanelRef} className={`fixed bottom-0 z-10 w-full p-3 bg-white rounded-t-3xl translate-y-full`}>
-        <VehiclePanel selectedVehiclePanel={setSelectedVehiclePanel} setVehiclePanel={setVehiclePanel} />
+        <VehiclePanel fare={rideFare} selectedVehiclePanel={setSelectedVehiclePanel} setVehiclePanel={setVehiclePanel} />
       </div>
       <div ref={selectedVehicleRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-4xl shadow-2xl translate-y-full`}>
         <SelectedVehiclePanel selectedVehiclePanel={setSelectedVehiclePanel} lookingForDriver={setLookingForDriver} />

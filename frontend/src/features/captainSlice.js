@@ -5,7 +5,7 @@ const initialState = {
   captain: null,
   loading: true,
   error: null,
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem("captainToken"),
 };
 
 export const captainLogin = createAsyncThunk(

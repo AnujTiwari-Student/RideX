@@ -3,7 +3,6 @@ import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage' // Uses localStorage for web
 import userReducer from '../features/userSlice'
 import captainReducer from '../features/captainSlice'
-import captainAuthReducer from '../features/captainAuthSlice'
 import userLocationReducer from '../features/userLocationSlice'
 import selectedVehicleReducer from '../features/selectedVehicleSlice'
 import paymentReducer from '../features/paymentSlice'
@@ -17,13 +16,12 @@ import driverReachedReducer from '../features/driverReachedSlice'
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user', 'captain', 'captainAuth' , 'rideAccepted' , 'otpVerification' , 'driverReached'], 
+  whitelist: ['user', 'captain' , 'rideAccepted' , 'otpVerification' , 'driverReached' , 'selectedVehicle' , 'payment'], 
 }
 
 const rootReducer = combineReducers({
   user: userReducer,
   captain: captainReducer,
-  captainAuth: captainAuthReducer,
   userLocation: userLocationReducer,
   selectedVehicle: selectedVehicleReducer,
   payment: paymentReducer,

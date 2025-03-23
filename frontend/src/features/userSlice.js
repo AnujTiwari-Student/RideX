@@ -5,7 +5,7 @@ const initialState = {
     user: null, 
     error: null,
     loading: true,
-    isAuthenticated: false
+    isAuthenticated: !!localStorage.getItem('token'),
 }
 
 export const loginUser = createAsyncThunk(

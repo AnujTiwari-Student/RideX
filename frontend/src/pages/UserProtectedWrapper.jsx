@@ -4,6 +4,10 @@ import { Navigate , Outlet } from 'react-router';
 
 const UserProtectedWrapper = () => {
 
+    if(!!localStorage.getItem('token') === false){
+      return <Navigate to='/login' replace />
+    }
+    
     const {isAuthenticated} = useSelector((state) => state.user);
 
     if(!isAuthenticated){

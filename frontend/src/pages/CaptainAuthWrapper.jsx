@@ -5,6 +5,10 @@ import { Navigate } from 'react-router-dom'
 
 const CaptainAuthWrapper = () => {
 
+    if(!!localStorage.getItem('captainToken') === false){
+        return <Navigate to='/login' replace />
+    }
+
     const {isAuthenticated} = useSelector((state) => state.captain);
 
     if(!isAuthenticated){
