@@ -1,6 +1,11 @@
 import React from 'react'
+import { useSelector } from 'react-redux';
 
 const LookingForDriver = () => {
+
+  const {pickup , destination} = useSelector((state) => state.userLocation);
+  const {selectedVehicleFare} = useSelector((state) => state.selectedVehicle);
+
   return (
     <div>
       <div className='w-full flex justify-center mt-3 mb-4 rounded-t-3xl'>
@@ -17,7 +22,7 @@ const LookingForDriver = () => {
                 <h5 className='text-black'><i className="ri-map-pin-2-fill text-xl"></i></h5>
             </div>
             <h4 className='text-lg font-semibold'>
-                24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+                {pickup}
             </h4>
         </div>
         <div className='flex gap-3 items-center mb-3'>
@@ -25,7 +30,7 @@ const LookingForDriver = () => {
                 <h5 className='text-black'><i className="ri-square-fill text-xl"></i></h5>
             </div>
             <h4 className='text-lg font-semibold'>
-                24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+                {destination}
             </h4>
         </div>
         <div className='flex gap-3 items-center mb-3'>
@@ -33,8 +38,8 @@ const LookingForDriver = () => {
                 <h5 className='text-black'><i className="ri-bank-card-2-fill text-xl"></i></h5>
             </div>
             <div className='flex flex-col'>
-                <h4 className='text-xl font-semibold'>
-                    $99
+                <h4 className='text-lg font-semibold tracking-wide'>
+                ₹ {Math.round(selectedVehicleFare)}
                 </h4>
                 <p className='font-medium text-gray-600'>
                     Cash Cash

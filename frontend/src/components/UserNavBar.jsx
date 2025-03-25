@@ -133,12 +133,8 @@ const UserNavBar = ({ setMenuOpen }) => {
               <LogOut color="gray" />
               <p>Logout</p>
             </li>
-            <div
-              className={`transition-opacity ${
-                loading ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <Loader ref={loaderRef} color="black" />
+            <div>
+              {loading ? <Loader ref={loaderRef} color="black" /> : null}
             </div>
           </div>
         </ul>

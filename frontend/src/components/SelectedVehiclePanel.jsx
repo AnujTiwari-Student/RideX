@@ -1,8 +1,24 @@
-import { ChevronRight } from 'lucide-react'
+import { createRide } from '@/features/rideRequestsListSlice'
+import { ChevronRight, LoaderCircle } from 'lucide-react'
 import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
+
+  const dispatch = useDispatch();
+
+  const {selectedVehicleFare} = useSelector((state) => state.selectedVehicle);
+  // console.log(selectedVehicleFare);
+  const vehicleType = useSelector((state) => state.selectedVehicle.selectedVehicle);
+  const {pickup , destination} = useSelector((state) => state.userLocation);
+
+  const handleClick = () => {
+    selectedVehiclePanel(false);
+    lookingForDriver(true);
+    dispatch(createRide({ pickup , destination , vehicleType }))
+  }
+
   return (
     <div>
       <div onClick={()=>{
@@ -21,7 +37,7 @@ const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
                 <h5 className='text-black'><i className="ri-map-pin-2-fill text-xl"></i></h5>
             </div>
             <h4 className='text-lg font-semibold'>
-                24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+                {pickup}
             </h4>
         </div>
         <div className='flex gap-3 items-center mb-3'>
@@ -29,7 +45,7 @@ const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
                 <h5 className='text-black'><i className="ri-square-fill text-xl"></i></h5>
             </div>
             <h4 className='text-lg font-semibold'>
-                24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+                {destination}
             </h4>
         </div>
         <div className='flex gap-3 items-center mb-5'>
@@ -38,8 +54,8 @@ const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
             </div>
             <div className='flex justify-between items-end w-full'>
                 <div className='flex flex-col'>
-                  <h4 className='text-xl font-semibold'>
-                      $99
+                  <h4 className='text-lg font-semibold tracking-wide'>
+                    ₹ {Math.round(selectedVehicleFare)}
                   </h4>
                   <p className='font-medium text-gray-600'>
                       Cash Cash
@@ -52,7 +68,7 @@ const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
             </div>
         </div>
         <button onClick={()=>{
-          selectedVehiclePanel(false) , lookingForDriver(true)
+          handleClick()
         }} className='text-lg font-semibold bg-black text-white rounded-md py-2 w-full'>
             Confirm Ride
         </button>

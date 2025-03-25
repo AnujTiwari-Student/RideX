@@ -50,7 +50,12 @@ module.exports.getLocationSuggestion = async (input) => {
 
     try {
         const response = await axios.get(url);
-        if (response.data.status !== 'OK') {
+        if (response.status === 401 || response.data.status === "REQUEST_DENIED") {
+            console.error("Unauthorized: Check API key or billing status");
+            throw new Error("Unauthorized request. Check API key or billing.");
+        }
+
+        if (response.data.status !== "OK") {
             throw new Error(`Google Maps API error: ${response.data.status}`);
         }
 

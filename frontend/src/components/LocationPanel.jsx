@@ -9,8 +9,7 @@ const LocationPanel = ({ setVehiclePanel, setPanelOpen , setUserLocation , focus
     const dispatch = useDispatch();
 
     const  suggestedLocation  = useSelector((state) => state.userLocation.locationSuggestion);
-
-    const [suggestion, setSuggestion] = useState([])
+    const {loading} = useSelector((state) => state.userLocation);
 
     console.log(suggestedLocation);
     const locations = Array.isArray(suggestedLocation) ? suggestedLocation : [];
@@ -19,7 +18,14 @@ const LocationPanel = ({ setVehiclePanel, setPanelOpen , setUserLocation , focus
 
     return (
         <div className="mt-8">
-            <div className="max-h-[60vh] overflow-y-auto px-4">
+            {loading ? (
+                <div className="max-h-[60vh] overflow-y-auto">
+                    <div className='h-10 rounded-lg bg-gray-200 animate-pulse mb-4'></div>
+                    <div className='h-10 rounded-lg bg-gray-200 animate-pulse mb-4'></div>
+                    <div className='h-10 rounded-lg bg-gray-200 animate-pulse mb-4'></div>
+                </div>
+            ):(
+                <div className="max-h-[60vh] overflow-y-auto px-4">
                 {locations.length > 0 ? (
                     locations.map((elem, index) => (
                         <div
@@ -43,6 +49,7 @@ const LocationPanel = ({ setVehiclePanel, setPanelOpen , setUserLocation , focus
                     ))
                 ) : null}
             </div>
+            )}
 
 
             {panelOpen  && isButtonEnabled && (

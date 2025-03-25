@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    selectedVehicle: null
+    selectedVehicle: null,
+    selectedVehicleFare: null
 }
 
 export const selectedVehicleSlice = createSlice({
@@ -11,10 +12,12 @@ export const selectedVehicleSlice = createSlice({
         setSelectedVehicle: (state, action) => {
             state.selectedVehicle = action.payload
         },
-      
+        setSelectedVehicleFare: (state, action) => {
+            state.selectedVehicleFare = action.payload
+        },
     }
 })
 
-export const {setSelectedVehicle} = selectedVehicleSlice.actions;
+export const {setSelectedVehicle , setSelectedVehicleFare} = selectedVehicleSlice.actions;
 
 export default selectedVehicleSlice.reducer;

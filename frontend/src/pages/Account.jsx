@@ -27,8 +27,8 @@ const Account = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [focusField, setFocusField] = useState(null)
 
-  const {rideFare} = useSelector((state) => state.rideRequestsList)
-  console.log(`Fare: ${rideFare}`)
+  const {rideFare , loading} = useSelector((state) => state.rideRequestsList)
+  // console.log(`Fare: ${rideFare}`)
 
   const [userLocation, setUserLocation] = useState({
     pickup: "",
@@ -117,7 +117,7 @@ const Account = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('Form Submitted')
+    // console.log('Form Submitted')
     dispatch(setPickup(userLocation.pickup))
     dispatch(setDestination(userLocation.destination))
   }
@@ -183,7 +183,7 @@ const Account = () => {
         </div>
       </div>
       <div ref={vehiclePanelRef} className={`fixed bottom-0 z-10 w-full p-3 bg-white rounded-t-3xl translate-y-full`}>
-        <VehiclePanel fare={rideFare} selectedVehiclePanel={setSelectedVehiclePanel} setVehiclePanel={setVehiclePanel} />
+        <VehiclePanel loading={loading} fare={rideFare} selectedVehiclePanel={setSelectedVehiclePanel} setVehiclePanel={setVehiclePanel} />
       </div>
       <div ref={selectedVehicleRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-4xl shadow-2xl translate-y-full`}>
         <SelectedVehiclePanel selectedVehiclePanel={setSelectedVehiclePanel} lookingForDriver={setLookingForDriver} />
