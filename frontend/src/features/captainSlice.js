@@ -3,7 +3,7 @@ import axios from "axios";
 
 const initialState = {
   captain: null,
-  loading: true,
+  loading: false,
   error: null,
   isAuthenticated: !!localStorage.getItem("captainToken"),
 };
@@ -79,6 +79,7 @@ export const captainSlice = createSlice({
       state.loading = true;
       state.error = null;
       state.captain = null;
+      state.isAuthenticated = false;
     })
     .addCase(captainLogin.fulfilled, (state, action) => {
       state.loading = false;
@@ -96,6 +97,7 @@ export const captainSlice = createSlice({
       state.loading = true;
       state.error = null;
       state.captain = null;
+      state.isAuthenticated = false;
     })
     .addCase(createCaptain.fulfilled, (state, action) => {
       state.loading = false;
@@ -112,12 +114,14 @@ export const captainSlice = createSlice({
     builder.addCase(logoutCaptain.pending, (state , action) => {
         state.loading = true;
         state.error = null;
+        state.isAuthenticated = true;
       })
     .addCase(logoutCaptain.fulfilled, (state , action) => {
+        localStorage.removeItem("captainToken");
         state.loading = false;
         state.captain = null;
         state.isAuthenticated = false;
-        localStorage.removeItem("captainToken");
+        state.error = null;
       })
     .addCase(logoutCaptain.rejected, (state, action) => {
         state.loading = false;

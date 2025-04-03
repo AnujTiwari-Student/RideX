@@ -190,7 +190,7 @@ The server will start on the port specified in your environment variables or def
   - `fullname.firstname` (string, required): Captain's first name (minimum 3 characters).
   - `fullname.lastname` (string, optional): Captain's last name (minimum 3 characters).
   - `password` (string, required): Captain's password (minimum 5 characters).
-  - `status` (string): Captain's status (either 'active' or 'inactive').
+  - `status` (string, required): Captain's status (either 'active' or 'inactive').
   - `vehicle.color` (string, required): Vehicle color (minimum 3 characters).
   - `vehicle.plate` (string, required): Vehicle plate number (minimum 3 characters).
   - `vehicle.capacity` (number, required): Vehicle capacity (minimum 1).
@@ -211,6 +211,7 @@ The server will start on the port specified in your environment variables or def
             "lastname": "Doe"
         },
         "password": "password123",
+        "status": "active",
         "vehicle": {
             "color": "red",
             "plate": "ABC123",

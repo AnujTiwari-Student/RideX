@@ -12,6 +12,7 @@ import rideAcceptedReducer from '../features/rideAcceptedSlice'
 import { combineReducers } from 'redux'
 import otpVerificationReducer from '../features/OTPVerificationSlice'
 import driverReachedReducer from '../features/driverReachedSlice'
+import socketReducer from '../features/socketSlice'; 
 
 const persistConfig = {
   key: 'root',
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
   rideAccepted: rideAcceptedReducer,
   otpVerification: otpVerificationReducer,
   driverReached: driverReachedReducer,
+  socket: socketReducer, 
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

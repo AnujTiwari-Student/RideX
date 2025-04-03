@@ -14,6 +14,7 @@ import DriverFound from '../components/DriverFound'
 import { Flag, Menu } from 'lucide-react'
 import UserNavBar from '@/components/UserNavBar'
 import axios from 'axios'
+import { sendMessage } from '@/features/socketSlice'
 
 const Account = () => {
   const dispatch = useDispatch()
@@ -26,9 +27,11 @@ const Account = () => {
   const [driverFound, setDriverFound] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
   const [focusField, setFocusField] = useState(null)
-
+  
   const {rideFare , loading} = useSelector((state) => state.rideRequestsList)
-  // console.log(`Fare: ${rideFare}`)
+  const {user} = useSelector((state)=> state.user)
+  
+  const currentUser = user ;
 
   const [userLocation, setUserLocation] = useState({
     pickup: "",
@@ -51,6 +54,10 @@ const Account = () => {
   const lookingForDriverRef = useRef(null)
   const driverFoundRef = useRef(null)
   const menuRef = useRef(null)
+
+  useEffect(()=>{
+    dispatch(sendMessage("join" , {userType: currentUser?.user?.role, userId: currentUser?.user?._id}))
+  }, [])
 
   useEffect(() => { 
       if (menuOpen) {
@@ -117,7 +124,6 @@ const Account = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // console.log('Form Submitted')
     dispatch(setPickup(userLocation.pickup))
     dispatch(setDestination(userLocation.destination))
   }

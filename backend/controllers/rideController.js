@@ -1,4 +1,5 @@
 const rideService = require('../services/ride.service')
+const mapsService = require('../services/maps.service')
 const { validationResult } = require('express-validator');
 
 
@@ -20,9 +21,18 @@ module.exports.createRide = async (req, res) => {
                 vehicleType
             }
         )
-        return res.status(201).json(ride)
-
-
+        
+        const getLocationCordinates = await mapsService.getLocation(pickup)
+        console.log("Pickup Location: ", getLocationCordinates)
+        
+        const captains = await mapsService.getNearByCaptains(getLocationCordinates.lat , getLocationCordinates.lng , 2000)
+        console.log("Captains in radius: ", captains)
+        
+        res.status(201).json({
+            ride,
+            captains
+        });
+        
     } catch (error) {
         res.status(500).json({message : error.message})
     }

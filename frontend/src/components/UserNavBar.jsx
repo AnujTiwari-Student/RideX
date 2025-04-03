@@ -23,7 +23,7 @@ const UserNavBar = ({ setMenuOpen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { loading } = useSelector((state) => state.captain);
+  const { loading } = useSelector((state) => state.user);
 
   const loaderRef = useRef(null);
 

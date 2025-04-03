@@ -11,7 +11,7 @@ import {
   Menu,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import logo from "../assets/logo/logo.jpeg";
 import CaptainDetail from "@/components/CaptainDetail";
 import mapImage from "../assets/image/Map.jpeg";
@@ -20,15 +20,39 @@ import { useGSAP } from "@gsap/react";
 import IncomingRide from "@/components/IncomingRidePanel";
 import CaptainNavBar from "@/components/CaptainNavBar";
 import { transform } from "framer-motion";
+import { sendMessage, updateLocation } from "@/features/socketSlice";
 
 const CaptainAccount = () => {
   
   const paymentMethod = useSelector((state) => state.payment.paymentMethod);
   const rideRequestsList = useSelector((state) => state.rideRequestsList.rideRequestsList);
+  const {captain} = useSelector((state)=> state.captain)
+    
+  const currentUser = captain;
+
+  const dispatch = useDispatch()
 
   const [menuOpen, setMenuOpen] = useState(false)
 
   const menuRef = useRef(null);
+
+  useEffect(()=>{
+
+    if (currentUser?.captain?.role && currentUser?.captain?._id) {
+      dispatch(sendMessage("join", {
+          userType: currentUser.captain.role,
+          userId: currentUser.captain._id,
+      }));
+  }
+
+    dispatch(updateLocation())
+    const locationInterval = setInterval(() => {
+      dispatch(updateLocation())
+    } , 10000)
+
+    return () => clearInterval(locationInterval)
+
+  }, [currentUser , dispatch])
 
   useEffect(() => {
     if (menuOpen) {
@@ -44,6 +68,7 @@ const CaptainAccount = () => {
         ease: "power2.out",
       });
     }
+
   }, [menuOpen]);
 
   return (
