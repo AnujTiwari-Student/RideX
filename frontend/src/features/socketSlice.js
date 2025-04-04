@@ -8,7 +8,6 @@ const initialState = {
     lastLocation: null,
 };
 
-// Create a socket connection and set it in the state
 export const createConnection = createAsyncThunk(
     'socket/createConnection',
     async (url, { dispatch }) => {

@@ -21,12 +21,18 @@ import IncomingRide from "@/components/IncomingRidePanel";
 import CaptainNavBar from "@/components/CaptainNavBar";
 import { transform } from "framer-motion";
 import { sendMessage, updateLocation } from "@/features/socketSlice";
+import { io } from "socket.io-client";
+import { fetchAllRides } from "@/features/rideRequestsListSlice";
 
 const CaptainAccount = () => {
+
+  const socket = io(import.meta.env.VITE_BASE_URL)
+  // console.log("Socket: ", socket)
   
   const paymentMethod = useSelector((state) => state.payment.paymentMethod);
-  const rideRequestsList = useSelector((state) => state.rideRequestsList.rideRequestsList);
+  const {rideRequestsList} = useSelector((state) => state.rideRequestsList);
   const {captain} = useSelector((state)=> state.captain)
+  console.log("All Ride Requests List: ", rideRequestsList)
     
   const currentUser = captain;
 
@@ -38,6 +44,9 @@ const CaptainAccount = () => {
 
   useEffect(()=>{
 
+    dispatch(fetchAllRides())
+
+
     if (currentUser?.captain?.role && currentUser?.captain?._id) {
       dispatch(sendMessage("join", {
           userType: currentUser.captain.role,
@@ -46,11 +55,16 @@ const CaptainAccount = () => {
   }
 
     dispatch(updateLocation())
-    const locationInterval = setInterval(() => {
-      dispatch(updateLocation())
-    } , 10000)
+    // const locationInterval = setInterval(() => {
+    //   dispatch(updateLocation())
+    // } , 10000)
 
-    return () => clearInterval(locationInterval)
+    socket.on('new-ride', (data) => {
+      console.log("New ride request: ", data)
+      // Handle the new ride request here
+    })
+
+    // return () => clearInterval(locationInterval)
 
   }, [currentUser , dispatch])
 

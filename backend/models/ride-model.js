@@ -6,12 +6,12 @@ const rideSchema = new mongoose.Schema({
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "user",
     required: true,
   },
   captain: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Captain",
+    ref: "captain",
   },
   pickup: {
     type: String,
@@ -50,7 +50,7 @@ const rideSchema = new mongoose.Schema({
   },
   otp: {
     type: String,
-    select: false
+    // select: false
   },
 });
 

@@ -6,7 +6,6 @@ const initialState = {
     rideFare: null,
     loading: false,
     error: null,
-    serverResponse: null,
 };
 
 export const getFare = createAsyncThunk(
@@ -55,10 +54,39 @@ export const createRide = createAsyncThunk(
     }
 )
 
+export const fetchAllRides = createAsyncThunk(
+    'rides/fetchAllRides',
+    async (_, { dispatch, rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.log("No authentication token found!");
+                return rejectWithValue({ message: "No authentication token" });
+            }
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/ride/all-rides`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            console.log('All Rides:', response.data);
+            dispatch(setRideRequestsList(response.data));
+            return response.data
+
+        }catch (error) {
+            console.log('API Error:', error);
+            return rejectWithValue({ message: error.message });
+        }
+    })
+
 const rideRequestsListSlice = createSlice({
     name: "rideRequestsList",
     initialState,
-    reducers: {},
+    reducers: {
+        setRideRequestsList: (state, action) => {
+            state.rideRequestsList = action.payload;
+        },
+        
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getFare.pending, (state) => {
@@ -81,7 +109,6 @@ const rideRequestsListSlice = createSlice({
             })
             .addCase(createRide.fulfilled, (state, action) => {
                 state.loading = false;
-                state.rideRequestsList = action.payload;
                 state.error = null;
             })
             .addCase(createRide.rejected, (state, action) => {
@@ -90,6 +117,8 @@ const rideRequestsListSlice = createSlice({
             });
     }
 })
+
+export const { setRideRequestsList } = rideRequestsListSlice.actions;
 
 const rideRequestsListReducer = rideRequestsListSlice.reducer;
 export default rideRequestsListReducer

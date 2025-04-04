@@ -13,7 +13,6 @@ function initializeSocket(server) {
     });
 
     io.on('connection', (socket) => {
-        // console.log('New client connected:', socket.id);
 
         socket.on('join', async (data) => {
             const { userId , userType } = data;
@@ -52,7 +51,7 @@ function initializeSocket(server) {
 
 function sendMessageToSocketId(socketId, message) {
     if (io && socketId) {
-        io.to(socketId).emit('message', message);
+        io.to(socketId).emit(message.event , message.data);
     } else {
         console.error('Socket not initialized or invalid socket ID:', socketId);
     }
