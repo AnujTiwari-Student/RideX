@@ -1,7 +1,7 @@
 const express = require('express')
 const { isLoggedIn } = require('../middlewares/auth.middleware')
 const { body } = require('express-validator')
-const { createRide , generateFare , fetchAllRides } = require('../controllers/rideController')
+const { createRide , generateFare , fetchAllRides , deleteRide } = require('../controllers/rideController')
 const router = express.Router()
 
 router.post('/create',
@@ -16,5 +16,7 @@ router.post('/fare',
     isLoggedIn , generateFare)
 
 router.get('/all-rides', isLoggedIn , fetchAllRides)
+
+router.delete('/delete/:rideId' , isLoggedIn , deleteRide)
 
 module.exports = router

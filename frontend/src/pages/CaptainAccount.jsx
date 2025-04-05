@@ -16,19 +16,15 @@ import logo from "../assets/logo/logo.jpeg";
 import CaptainDetail from "@/components/CaptainDetail";
 import mapImage from "../assets/image/Map.jpeg";
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import IncomingRide from "@/components/IncomingRidePanel";
 import CaptainNavBar from "@/components/CaptainNavBar";
 import { transform } from "framer-motion";
 import { sendMessage, updateLocation } from "@/features/socketSlice";
-import { io } from "socket.io-client";
-import { fetchAllRides } from "@/features/rideRequestsListSlice";
+import { addRideRequest, fetchAllRides } from "@/features/rideRequestsListSlice";
 
 const CaptainAccount = () => {
 
-  const socket = io(import.meta.env.VITE_BASE_URL)
-  // console.log("Socket: ", socket)
-  
+  const {socket , connected} = useSelector((state) => state.socket);
   const paymentMethod = useSelector((state) => state.payment.paymentMethod);
   const {rideRequestsList} = useSelector((state) => state.rideRequestsList);
   const {captain} = useSelector((state)=> state.captain)
@@ -42,31 +38,48 @@ const CaptainAccount = () => {
 
   const menuRef = useRef(null);
 
+  useEffect(() => {
+    if (connected && socket) {
+      console.log("Captain's socket ID:", socket.id); 
+    }
+  }, [connected, socket]);
+
+  useEffect(() => {
+    if (socket && connected) {
+      dispatch(fetchAllRides())
+      const handleNewRide = (data) => {
+        console.log("New ride request: ", data);
+        dispatch(addRideRequest(data));
+      };
+
+      socket.on("new-ride", handleNewRide);
+
+      return () => {
+        socket.off("new-ride", handleNewRide);
+      };
+    }
+  }, [socket , connected , dispatch]);
+
+  
   useEffect(()=>{
-
-    dispatch(fetchAllRides())
-
-
-    if (currentUser?.captain?.role && currentUser?.captain?._id) {
+    
+    if (socket && connected && currentUser?.captain?.role && currentUser?.captain?._id) {
       dispatch(sendMessage("join", {
           userType: currentUser.captain.role,
           userId: currentUser.captain._id,
       }));
   }
 
-    dispatch(updateLocation())
+    if(socket && connected){
+      dispatch(updateLocation())
+    }
     // const locationInterval = setInterval(() => {
     //   dispatch(updateLocation())
     // } , 10000)
 
-    socket.on('new-ride', (data) => {
-      console.log("New ride request: ", data)
-      // Handle the new ride request here
-    })
-
     // return () => clearInterval(locationInterval)
 
-  }, [currentUser , dispatch])
+  }, [socket, connected, currentUser, dispatch])
 
   useEffect(() => {
     if (menuOpen) {
@@ -99,7 +112,7 @@ const CaptainAccount = () => {
       <div
         className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl`}
       >
-        <CaptainDetail rideRequestsList={rideRequestsList} paymentMethod={paymentMethod} />
+        <CaptainDetail rideRequestsList={rideRequestsList} paymentMethod={paymentMethod} socket={socket} connected={connected} />
       </div>
 
       <div

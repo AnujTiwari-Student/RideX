@@ -76,7 +76,32 @@ export const fetchAllRides = createAsyncThunk(
             console.log('API Error:', error);
             return rejectWithValue({ message: error.message });
         }
-    })
+})
+
+export const deleteRide = createAsyncThunk(
+    'rides/deleteRide',
+    async (rideId, { dispatch, rejectWithValue , getState }) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.log("No authentication token found!");
+                return rejectWithValue({ message: "No authentication token" });
+            }
+            const response = await axios.delete(`${import.meta.env.VITE_BASE_URL}/ride/delete/${rideId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            console.log('Deleteing Ride:', rideId);
+            console.log('Delete API Response:', response.data);
+            dispatch(fetchAllRides())
+            return response.data
+        }catch (error) {
+            console.log('API Error:', error);
+            return rejectWithValue({ message: error.message });
+        }
+    }
+)
 
 const rideRequestsListSlice = createSlice({
     name: "rideRequestsList",
@@ -85,7 +110,13 @@ const rideRequestsListSlice = createSlice({
         setRideRequestsList: (state, action) => {
             state.rideRequestsList = action.payload;
         },
-        
+        addRideRequest: (state, action) => {
+            const newRide = action.payload;
+            const exists = state.rideRequestsList.find(ride => ride._id === newRide._id);
+            if (!exists) {
+                state.rideRequestsList.push(newRide); 
+            }
+        },        
     },
     extraReducers: (builder) => {
         builder
@@ -118,7 +149,7 @@ const rideRequestsListSlice = createSlice({
     }
 })
 
-export const { setRideRequestsList } = rideRequestsListSlice.actions;
+export const { setRideRequestsList , addRideRequest } = rideRequestsListSlice.actions;
 
 const rideRequestsListReducer = rideRequestsListSlice.reducer;
 export default rideRequestsListReducer

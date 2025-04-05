@@ -22,10 +22,10 @@ const rideSchema = new mongoose.Schema({
     required: true,
   },
   distance: {
-    type: Number,
+    type: String,
   },
   duration: {
-    type: Number,
+    type: String,
   },
   fare: {
     type: Number,

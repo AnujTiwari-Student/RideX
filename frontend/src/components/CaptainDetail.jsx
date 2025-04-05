@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import IncomingRidePanel from "./IncomingRidePanel";
 import gsap from "gsap";
 
-const CaptainDetail = ({rideRequestsList , paymentMethod}) => {
+const CaptainDetail = ({rideRequestsList , paymentMethod , socket , connected}) => {
 
     const [incomingRidePanel, setIncomingRidePanel] = useState(false)
 
@@ -84,7 +84,7 @@ const CaptainDetail = ({rideRequestsList , paymentMethod}) => {
         ref={IncomingRidePanelRef}
         className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}
       >
-        <IncomingRidePanel rideRequestsList={rideRequestsList} paymentMethod={paymentMethod} incomingRidePanel={incomingRidePanel} setIncomingRidePanel={setIncomingRidePanel}/>
+        <IncomingRidePanel rideRequestsList={rideRequestsList} paymentMethod={paymentMethod} incomingRidePanel={incomingRidePanel} socket={socket} connected={connected} setIncomingRidePanel={setIncomingRidePanel}/>
       </div>
     </>
   );

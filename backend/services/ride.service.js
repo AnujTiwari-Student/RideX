@@ -81,6 +81,11 @@ module.exports.createRide = async ({
     throw new Error(`Invalid vehicle type: ${vehicleType}`);
   }
 
+  const distance = await mapsService.getDistance(pickup, destination);
+  if (distance.status !== 'OK') {
+    throw new Error(`Maps API error: ${distance.status}`);
+  }
+
   const ride = await rideModel.create({
     message: "Ride created successfully",
     user,
@@ -88,6 +93,7 @@ module.exports.createRide = async ({
     destination,
     otp: getOtp(6),
     fare: fare[vehicleType],
+    distance: distance.distance.text,
   });
 
   return ride;
@@ -99,4 +105,9 @@ module.exports.generateFare = async (pickup, destination) => {
   }
   const fare = await getFare(pickup, destination);
   return fare;
+}
+
+module.exports.deleteRide = async (rideId) => {
+  const ride = await rideModel.findByIdAndDelete(rideId);
+  return ride;
 }
