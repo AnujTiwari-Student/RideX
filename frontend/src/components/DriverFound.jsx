@@ -3,8 +3,11 @@ import { MessageSquareMore, SendHorizontal } from 'lucide-react';
 import { Phone , Map , Shield , Star } from 'lucide-react';
 import gsap from 'gsap';
 import MessagePanel from './MessagePanel';
+import { useDispatch, useSelector } from 'react-redux';
 
 const DriverFound = ({driverFound}) => {
+
+    const dispatch = useDispatch()
 
     const [messagePanelOpen, setMessagePanelOpen] = useState(false);
   

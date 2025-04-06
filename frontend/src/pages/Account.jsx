@@ -30,8 +30,10 @@ const Account = () => {
   
   const {rideFare , loading} = useSelector((state) => state.rideRequestsList)
   const {user} = useSelector((state)=> state.user)
-  
-  const currentUser = user ;
+  const {socket , connected} = useSelector((state) => state.socket);
+  const {rideAccepted} = useSelector((state)=> state.rideAccepted)
+
+   const currentUser = user ;
 
   const [userLocation, setUserLocation] = useState({
     pickup: "",
@@ -57,7 +59,7 @@ const Account = () => {
 
   useEffect(()=>{
     dispatch(sendMessage("join" , {userType: currentUser?.user?.role, userId: currentUser?.user?._id}))
-  }, [])
+  }, [dispatch, currentUser])
 
   useEffect(() => { 
       if (menuOpen) {

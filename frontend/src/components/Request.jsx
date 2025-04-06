@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import gsap from "gsap";
 import CaptainRideDetailPanel from "./CaptainRideDetailPanel";
 import { useSelector , useDispatch } from "react-redux";
-import { setAcceptedRideIndex, setRideAccepted, setRideId } from "@/features/rideAcceptedSlice";
+import { setAcceptedRideIndex, setRideAccepted, setRideAcceptedData, setRideId } from "@/features/rideAcceptedSlice";
 import { nanoid } from "@reduxjs/toolkit";
 
 const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index}) => {
@@ -17,28 +17,13 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
 
   const {rideAccepted} = useSelector((state)=> state.rideAccepted)
   const {rideId} = useSelector((state)=> state.rideAccepted)
-  const {acceptedRideIndex} = useSelector((state)=> state.rideAccepted)
+  const {acceptedRideIndex , rideAcceptedData} = useSelector((state)=> state.rideAccepted)
 
   const rideDetailsPanelRef = useRef(null);
 
-/**
- * Handles the ignore action for a ride request card.
- * If a ride is already accepted and the current card's index
- * is not the accepted index, the action is prevented.
- * Otherwise, it sets the current card as removed.
- */
-
-  const handleIgnore = () => {
-    onRemove(ride.id)  
+  const handleIgnore = (_id) => {
+    onRemove(_id)  
   };
-
-//   console.log("rideAccepted:", rideAccepted);
-//   console.log("acceptedRideIndex:", acceptedRideIndex);
-//   console.log("index:", index);
-//   console.log(
-//     "Condition for View Location:",
-//     rideAccepted && index === acceptedRideIndex
-//   );
 
   useEffect(() => {
     if (rideDetailsPanel) {
@@ -67,14 +52,14 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
               alt="user-img"
             />
             <div className="flex flex-col items-start gap-1">
-              <h3 className="text-lg font-bold">{ride.user.name}</h3>
+              <h3 className="text-lg font-bold">{ride.user.firstname} {ride.user.lastname}</h3>
               <div className="bg-yellow-400 flex items-center justify-center px-8 rounded-xl">
                 <p className="font-bold text-sm">{ride.paymentType}</p>
               </div>
             </div>
           </div>
           <div className="flex flex-col items-end">
-            <h3 className="text-lg font-bold">${ride.fare}</h3>
+            <h3 className="text-lg font-bold">₹{ride.fare}</h3>
             <p className="text-sm">{ride.distance}</p>
           </div>
         </div>
@@ -88,7 +73,7 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
               </h5>
             </div>
             <h4 className="text-base font-medium">
-              {ride?.pickup?.address}
+              {ride?.pickup}
             </h4>
           </div>
         </div>
@@ -102,7 +87,7 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
             </h5>
           </div>
           <h4 className="text-base font-medium">
-          {ride?.dropoff?.address}
+          {ride?.destination}
           </h4>
         </div>
       </div>
@@ -113,10 +98,9 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
       >
         <CaptainRideDetailPanel
           setRideDetailsPanel={setRideDetailsPanel}
-          rideRequests={rideRequestsList}
-          ride={ride}
+          rideAcceptedData={rideAcceptedData}
           index={index}
-          onRemove={onRemove}
+          onRemove={handleIgnore}
           totalRequests={totalRequests}
         />
       </div>
@@ -125,7 +109,7 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
         <div>
           <div className="border-[1px] border-gray-100 w-full m-4 px-4"></div>
           <div className="px-4 my-2 w-full flex items-center justify-center gap-2">
-            {rideAccepted && index === acceptedRideIndex ? (
+            {rideAccepted && ride._id === acceptedRideIndex ? (
               <button
                 onClick={() => {
                   setRideDetailsPanel(true);
@@ -139,10 +123,10 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
                 <button
                   onClick={() => {
                     if (totalRequests.length > 1) {
-                      handleIgnore();
+                      handleIgnore(ride._id);
                     } else {
-                        handleIgnore();
-                      navigate("/captain/dashboard");
+                        handleIgnore(ride._id);
+                        navigate("/captain/dashboard");
                     }
                   }}
                   className="w-1/2 px-4 py-2 text-black font-semibold rounded-lg bg-yellow-400"
@@ -154,10 +138,10 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
                   onClick={() => {
                     setRideDetailsPanel(true);
                     dispatch(setRideAccepted(true));
-                    dispatch(setRideId(nanoid()))
-                    dispatch(setAcceptedRideIndex(index))
+                    dispatch(setAcceptedRideIndex(ride._id));
+                    dispatch(setRideAcceptedData(ride));
                   }}
-                  disabled={rideAccepted && index !== acceptedRideIndex}
+                  disabled={rideAccepted && ride._id !== acceptedRideIndex}
                   className={`w-1/2 px-4 py-2 text-black font-semibold rounded-lg ${
                     rideAccepted && index !== acceptedRideIndex
                       ? "bg-gray-400 cursor-not-allowed"

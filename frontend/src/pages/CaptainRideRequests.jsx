@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft, Menu } from "lucide-react";
 import Request from "@/components/Request";
 import CaptainNavBar from "@/components/CaptainNavBar";
 import gsap from "gsap";
+import { createRide, deleteRide } from "@/features/rideRequestsListSlice";
 
 const AllRideRequest = () => {
   const rideRequests = [
@@ -99,18 +100,30 @@ const AllRideRequest = () => {
   ];
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [removedCard, setRemovedCard] = useState(rideRequests)
+  const [removedCard, setRemovedCard] = useState([])
 
-  const rideRequestsList = useSelector(
-    (state) => state.rideRequestsList.rideRequestsList
-  );
-
-  console.log(removedCard);
   
 
-  const handleRemove = (id)=>{
-    setRemovedCard((prevRequest)=> prevRequest.filter((ride)=> ride.id !== id))
+  const rideRequestsList = useSelector((state) => state.rideRequestsList.rideRequestsList);
+  useEffect(() => {
+    console.log("Ride Requests List at captain dashboard:", rideRequestsList);
+  }, [rideRequestsList]);
+
+  useEffect(()=>{
+    if(rideRequestsList.length > 0){
+      setRemovedCard(rideRequestsList)
+    }
+  }, [rideRequestsList])
+
+  // console.log("removedCard", removedCard);
+  
+
+  const handleRemove = (_id)=>{
+    console.log("Removing ride with ID:", _id);
+    dispatch(deleteRide(_id)) 
+    setRemovedCard((prevRequest)=> prevRequest.filter((ride)=> ride._id !== _id))
   }
 
   const [menuOpen, setMenuOpen] = useState(false)
@@ -141,17 +154,26 @@ const AllRideRequest = () => {
 
   return (
     <div className="h-screen overflow-y-scroll">
-      <div onClick={()=>{
+      <div className="px-4 py-4 w-full flex items-center justify-between bg-white shadow-md">
+        <div onClick={()=>{
           setMenuOpen(true)
-        }} className="px-4 py-4 w-max">
-        <Menu />
+        }} className="w-max">
+          <Menu />
+        </div>
+        <div
+          onClick={() => {
+            navigate("/captain/dashboard");
+          }}
+        >
+          <ArrowLeft />
+        </div>
       </div>
       <div className="bg-orange-400 py-3 flex jsutify-center text-lg text-black font-semibold px-4">
         You have {removedCard.length} new requests.
       </div>
       <div className="ride-requests-container bg-gray-200">
         {removedCard.map((ride, index) => (
-          <Request key={ride.id} rideRequestsList={rideRequestsList} index={index} ride={ride} onRemove={handleRemove} totalRequests={removedCard} />
+          <Request key={ride._id} rideRequestsList={rideRequestsList} index={index} ride={ride} onRemove={handleRemove} totalRequests={removedCard} />
         ))}
       </div>
       <div

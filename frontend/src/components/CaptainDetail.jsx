@@ -1,11 +1,13 @@
 import { Gauge, Notebook, Timer } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import IncomingRidePanel from "./IncomingRidePanel";
 import gsap from "gsap";
 
 const CaptainDetail = ({rideRequestsList , paymentMethod , socket , connected}) => {
+
+    const navigate = useNavigate()
 
     const [incomingRidePanel, setIncomingRidePanel] = useState(false)
 
@@ -65,7 +67,7 @@ const CaptainDetail = ({rideRequestsList , paymentMethod , socket , connected}) 
           </div>
         </div>
       </div>
-      {rideRequestsList.length > 0 && (
+      {rideRequestsList.length == 1 && (
         <div 
             onClick={()=>{
               setIncomingRidePanel(true)
@@ -79,12 +81,26 @@ const CaptainDetail = ({rideRequestsList , paymentMethod , socket , connected}) 
         </div>
       )}
 
+      {rideRequestsList.length > 1 && (
+        <div 
+            onClick={()=>{
+              navigate("/captain/ride-requests" , {state : {rideRequestsList}})
+            }} 
+            className="px-4 md:px-8 w-full flex items-center justify-center">
+          <button
+            className="w-full bg-black text-white text-center font-semibold my-4 rounded-md py-3"
+          >
+            See All Requests
+          </button>
+        </div>
+      )}
+
       
       <div
         ref={IncomingRidePanelRef}
         className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}
       >
-        <IncomingRidePanel rideRequestsList={rideRequestsList} paymentMethod={paymentMethod} incomingRidePanel={incomingRidePanel} socket={socket} connected={connected} setIncomingRidePanel={setIncomingRidePanel}/>
+        <IncomingRidePanel rideRequestsList={rideRequestsList} paymentMethod={paymentMethod} incomingRidePanel={incomingRidePanel}  setIncomingRidePanel={setIncomingRidePanel}/>
       </div>
     </>
   );

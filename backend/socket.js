@@ -51,7 +51,7 @@ function initializeSocket(server) {
 
 function sendMessageToSocketId(socketId, message) {
     if (io && socketId) {
-        io.to(socketId).emit(message.event , message.data);
+        io.to(socketId).emit(message.event , message.data , message.captain);
     } else {
         console.error('Socket not initialized or invalid socket ID:', socketId);
     }

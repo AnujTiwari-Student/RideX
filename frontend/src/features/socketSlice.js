@@ -87,6 +87,14 @@ export const sendMessage = (eventName, message) => (dispatch , getState) => {
     }
 };
 
+export const rideRequestAccepted = (captain) => (dispatch, getState) => {
+    const { socket } = getState().socket;
+    if (socket) {
+        console.log(`Sending message: ride-accepted`, captain);
+        socket.emit('ride-accepted', captain);
+    }
+};
+
 const socketSlice = createSlice({
     name: 'socket',
     initialState,

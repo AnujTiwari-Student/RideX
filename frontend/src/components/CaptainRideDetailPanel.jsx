@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft, MessageSquareMore, Phone, Trash2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { setRideAccepted } from "@/features/rideAcceptedSlice";
+import { setAcceptedRideIndex, setRideAccepted, setRideAcceptedData } from "@/features/rideAcceptedSlice";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import MessagePanel from "./MessagePanel";
 import gsap from "gsap";
+import { deleteRide } from "@/features/rideRequestsListSlice";
 
 const CaptainRideDetailPanel = ({
   setRideDetailsPanel,
-  ride,
-  onRemove,
-  totalRequests,
+  rideAcceptedData,
+  paymentMethod,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -21,6 +21,13 @@ const CaptainRideDetailPanel = ({
   const [messagePanelOpen, setMessagePanelOpen] = useState(false);
 
   const messagePanelRef = useRef(null);
+
+  let discount = 10; // Example discount value
+  let totalFare = rideAcceptedData?.fare - discount; // Calculate total fare after discount
+
+  useEffect(() => {
+    console.log("Ride Accepted Data:", rideAcceptedData?._id);
+  }, [rideAcceptedData]);
 
   useEffect(() => {
     if(messagePanelOpen){
@@ -33,17 +40,6 @@ const CaptainRideDetailPanel = ({
       })
     }
     }, [messagePanelOpen])
-
-  const handleIgnore = () => {
-    if (totalRequests.length > 1) {
-      onRemove(ride.id);
-      toast.success("Ride Cancelled");
-    } else {
-      onRemove(ride.id);
-      navigate("/captain/dashboard");
-      toast.success("Ride Cancelled");
-    }
-  };
 
   return (
     <div className="h-full overflow-scroll">
@@ -68,13 +64,13 @@ const CaptainRideDetailPanel = ({
             alt="user-img"
           />
           <div className="flex flex-col items-start">
-            <h3 className="text-base font-bold">Anuj Tiwari</h3>
-            <p className="font-semibold text-sm text-gray-500">Cash</p>
+            <h3 className="text-base font-bold">{rideAcceptedData?.user?.firstname} <span>{rideAcceptedData?.user?.lastname}</span></h3>
+            <p className="font-semibold text-sm text-gray-500">Ride</p>
           </div>
         </div>
         <div className="flex flex-col items-end">
-          <h3 className="text-base font-bold">$100.00</h3>
-          <p className="text-sm text-gray-500 font-semibold">20.2 km</p>
+          <h3 className="text-base font-bold tracking-tighter">₹ {rideAcceptedData?.fare}.00</h3>
+          <p className="text-sm text-gray-500 font-semibold">{rideAcceptedData?.distance}</p>
         </div>
       </div>
       <div className="border-[1px] border-gray-100 w-full mb-2 mt-4 px-4"></div>
@@ -87,7 +83,7 @@ const CaptainRideDetailPanel = ({
             </h5>
           </div>
           <h4 className="text-sm font-medium">
-            24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+            {rideAcceptedData?.pickup}
           </h4>
         </div>
       </div>
@@ -101,14 +97,14 @@ const CaptainRideDetailPanel = ({
           </h5>
         </div>
         <h4 className="text-sm font-medium">
-          24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+          {rideAcceptedData?.destination}
         </h4>
       </div>
 
       <div className="border-[1px] border-gray-100 w-full mb-2 mt-4 px-4"></div>
 
       <div className="px-4">
-        <p className="font-semibold text-gray-400 pb-2">Noted</p>
+        <p className="font-semibold text-gray-400 pb-2">Note</p>
         <p className="text-sm">
           Your currentIndex is used to track which ride request is currently
           being displayed. When the "Ignore" button is clicked, it increments
@@ -122,16 +118,16 @@ const CaptainRideDetailPanel = ({
         <p className="font-semibold text-gray-400 pb-2">Total Fare</p>
         <div className="flex flex-col gap-1">
           <div className="flex justify-between items-center">
-            <p className="text-sm font-bold">Cash</p>
-            <p className="text-sm font-bold">$100.00</p>
+            <p className="text-sm font-bold">Amount</p>
+            <p className="text-sm font-bold tracking-tighter">₹ {rideAcceptedData?.fare}.00</p>
           </div>
           <div className="flex justify-between items-center">
             <p className="text-sm font-bold">Discount</p>
-            <p className="text-sm font-bold">$10.00</p>
+            <p className="text-sm font-bold">₹ {discount}.00</p>
           </div>
           <div className="flex justify-between items-center">
             <p className="text-sm font-bold">Total</p>
-            <p className="text-sm font-bold">$90.00</p>
+            <p className="text-sm font-bold">₹ {totalFare}.00</p>
           </div>
         </div>
       </div>
@@ -152,9 +148,11 @@ const CaptainRideDetailPanel = ({
         </div>
         <div
           onClick={() => {
-            dispatch(setRideAccepted(false));
             setRideDetailsPanel(false);
-            handleIgnore();
+            dispatch(deleteRide(rideAcceptedData?._id));
+            dispatch(setRideAccepted(false));
+            dispatch(setAcceptedRideIndex(null))
+            dispatch(setRideAcceptedData(null));
           }}
           className="flex flex-col py-3 gap-1 w-24 items-center rounded-xl bg-gray-400"
         >

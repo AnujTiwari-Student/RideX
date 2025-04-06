@@ -17,7 +17,7 @@ import socketReducer from '../features/socketSlice';
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user', 'captain' , 'rideAccepted' , 'otpVerification' , 'driverReached' , 'selectedVehicle' , 'payment'], 
+  whitelist: ['user', 'captain' , 'rideAccepted' , 'otpVerification' , 'driverReached' , 'selectedVehicle' , 'payment' , 'rideRequestsList' , 'rideAccepted'], 
 }
 
 const rootReducer = combineReducers({

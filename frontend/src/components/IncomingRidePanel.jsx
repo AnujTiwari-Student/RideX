@@ -5,20 +5,22 @@ import { useNavigate } from "react-router-dom";
 import CaptainRideDetailPanel from "./CaptainRideDetailPanel";
 import gsap from "gsap";
 import { deleteRide, fetchAllRides } from "@/features/rideRequestsListSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setAcceptedRideIndex, setRideAccepted, setRideAcceptedData } from "@/features/rideAcceptedSlice";
 
 const IncomingRidePanel = ({
   rideRequestsList = [],
   paymentMethod,
-  setIncomingRidePanel,
-  socket,
-  connected,
+  setIncomingRidePanel
 }) => {
+
+  const navigate = useNavigate();
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const [rideDetailsPanel, setRideDetailsPanel] = useState(false);
-
+  const {rideAccepted , rideAcceptedData, acceptedRideIndex} = useSelector((state)=> state.rideAccepted)
+  
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -37,10 +39,13 @@ const IncomingRidePanel = ({
 
   const latestRide = rideRequestsList[rideRequestsList.length - 1];
 
-  const handleIgnore = () => {
-    if (!latestRide) return;
-    console.log("Ignoring ride:", latestRide._id);
-    dispatch(deleteRide(latestRide._id));
+  useEffect(()=>{
+    console.log("latest ride", latestRide)
+  }, [latestRide])
+
+  const handleIgnore = (ride) => {
+    console.log("Ignoring ride:", ride._id);
+    dispatch(deleteRide(ride._id));
   };  
 
   useEffect(() => {
@@ -48,6 +53,28 @@ const IncomingRidePanel = ({
       setIncomingRidePanel(false);
     }
   }, [rideRequestsList]);
+
+  const handleAccept = (ride) => {
+    console.log("Accepting ride:", ride._id);
+    dispatch(setRideAccepted(true));
+    dispatch(setAcceptedRideIndex(ride._id));
+    dispatch(setRideAcceptedData(ride));
+    setRideDetailsPanel(true);
+  };
+
+  useEffect(()=>{
+    console.log("Accepted Ride Data:", rideAcceptedData);
+  }, [rideAcceptedData])
+
+  const handleViewDetails = () => {
+    if (!latestRide) return;
+    console.log("Viewing ride details Only:", latestRide?._id);
+    console.log("Ride Accepted Data:", rideAcceptedData);
+    setRideDetailsPanel(true);
+  }
+
+  // console.log("Accepted Ride Index:", acceptedRideIndex);
+  // console.log("Latest Ride ID:", latestRide?._id);
   
 
   useEffect(() => {
@@ -117,38 +144,43 @@ const IncomingRidePanel = ({
 
           <div className="border-[1px] border-gray-100 w-full mb-2 mt-4"></div>
 
-          <div
-            className={`w-full items-center flex ${
-              rideRequestsList.length > 1 ? "justify-between" : "justify-end"
-            } gap-5 `}
-          >
-            {rideRequestsList.length > 1 && (
-              <Link
-                className="flex font-medium text-sm underline underline-offset-2"
-                to="/captain/ride-requests"
-              >
-                View All
-              </Link>
-            )}
-            <div className="items-center flex justify-end gap-5">
-              <button
-                onClick={() => {
-                  handleIgnore();
-                }}
-                className="font-bold text-gray-500 text-lg"
-              >
-                Ignore
-              </button>
-              <button
-                onClick={() => {
-                  setRideDetailsPanel(true);
-                }}
-                className="bg-black text-white px-8 py-3 rounded-xl"
-              >
-                Accept
-              </button>
-            </div>
-          </div>
+          {
+  rideRequestsList.length > 1 ? (
+    latestRide ? (
+      <div className="bg-black text-white text-center px-8 py-3 rounded-xl">
+        <button onClick={() => 
+          navigate("/captain/ride-requests")
+        }>
+          See All Requests
+        </button>
+      </div>
+    ) : null
+  ) : (
+    <div className="items-center flex justify-end gap-5">
+      {rideAccepted && latestRide?._id === acceptedRideIndex ? null : (
+        <button
+          onClick={() => handleIgnore(latestRide)}
+          className="font-bold text-gray-500 text-lg"
+        >
+          Ignore
+        </button>
+      )}
+      <button
+        onClick={() => {
+          if (!rideAccepted) {
+            handleAccept(latestRide);
+          } else {
+            handleViewDetails();
+          }
+        }}
+        className="bg-black text-white px-8 py-3 rounded-xl"
+      >
+        {rideAccepted && latestRide?._id === acceptedRideIndex ? "View" : "Accept"}
+      </button>
+    </div>
+  )
+}
+
         </div>
       </div>
 
@@ -157,7 +189,8 @@ const IncomingRidePanel = ({
         className={`fixed bottom-0 z-10 h-screen w-full bg-white rounded-t-3xl translate-y-full`}
       >
         <CaptainRideDetailPanel
-          rideRequestsList={rideRequestsList}
+          setRideDetailsPanel={setRideDetailsPanel}
+          rideAcceptedData={rideAcceptedData}
           paymentMethod={paymentMethod}
         />
       </div>

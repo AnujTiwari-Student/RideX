@@ -3,6 +3,7 @@ import axios from "axios";
 
 const initialState = {
     rideRequestsList: [],
+    captain: null,
     rideFare: null,
     loading: false,
     error: null,
@@ -33,7 +34,7 @@ export const getFare = createAsyncThunk(
 
 export const createRide = createAsyncThunk(
     'createRide/createRide',
-    async (data, { rejectWithValue }) => {
+    async (data, { dispatch, rejectWithValue }) => {
         try {
                 const token = localStorage.getItem('token');
                 if (!token) {
@@ -46,6 +47,7 @@ export const createRide = createAsyncThunk(
                     },
                 })
                 console.log('API Response:', response.data);
+                dispatch(setCaptain(response.data.captain))
                 return response.data
             }catch (error) {
                 console.log('API Error:', error);
@@ -116,7 +118,10 @@ const rideRequestsListSlice = createSlice({
             if (!exists) {
                 state.rideRequestsList.push(newRide); 
             }
-        },        
+        }, 
+        setCaptain: (state, action) => {
+            state.captain = action.payload;
+        },       
     },
     extraReducers: (builder) => {
         builder

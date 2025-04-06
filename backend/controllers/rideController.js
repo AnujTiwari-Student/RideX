@@ -25,13 +25,10 @@ module.exports.createRide = async (req, res) => {
         )
         
         const getLocationCordinates = await mapsService.getLocation(pickup)
-        // console.log("Pickup Location: ", getLocationCordinates)
         
         const captains = await mapsService.getNearByCaptains(getLocationCordinates.lat , getLocationCordinates.lng , 2000)
-        // console.log("Captains in radius: ", captains)
 
         const rideData = await rideModel.findOne({_id: ride._id}).populate('user').select('-otp')
-        // console.log("Ride Data: ", rideData)        
 
         if(captains.length > 0){
             captains.map(captain => {
@@ -42,7 +39,6 @@ module.exports.createRide = async (req, res) => {
                 })
             });
         }
-
         
         res.status(201).json({
             ride: rideData,
