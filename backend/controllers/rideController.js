@@ -93,3 +93,29 @@ module.exports.generateFare = async (req, res) => {
         res.status(500).json({message : error.message})
     }
 }
+
+module.exports.confirmRide = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({errors: errors.array()})
+        }
+
+        const {rideId} = req.body;
+
+        const ride = await rideService.confirmRide(rideId , req.captain._id)
+        if(!ride){
+            return res.status(404).json({message: "Ride not found"})
+        }
+        console.log("ride.rideId: ", ride.user.socketId)
+        console.log("Ride: ", ride)
+        sendMessageToSocketId(ride.user.socketId , {
+            event: 'ride-confirmed',
+            data: ride,
+        })
+
+        res.status(200).json(ride)
+    } catch (error) {
+        res.status(500).json({message : error.message})
+    }
+}

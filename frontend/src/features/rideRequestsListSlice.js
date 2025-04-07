@@ -105,6 +105,31 @@ export const deleteRide = createAsyncThunk(
     }
 )
 
+export const confirmRide = createAsyncThunk(
+    'rides/confirmRide',
+    async (rideId, { rejectWithValue }) => {
+
+        try {
+            const token = localStorage.getItem('captainToken');
+            if (!token) {
+                console.log("No authentication token found!");
+                return rejectWithValue({ message: "No authentication token" });
+            }
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/ride/confirm`, {rideId}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            console.log('Confirming Ride:', rideId);
+            console.log('Confirm API Response:', response.data);
+            return response.data
+        }catch (error) {
+            console.log('API Error:', error);
+            return rejectWithValue({ message: error.message });
+        }
+    }
+)
+
 const rideRequestsListSlice = createSlice({
     name: "rideRequestsList",
     initialState,
@@ -154,7 +179,7 @@ const rideRequestsListSlice = createSlice({
     }
 })
 
-export const { setRideRequestsList , addRideRequest } = rideRequestsListSlice.actions;
+export const { setRideRequestsList , addRideRequest , setCaptain } = rideRequestsListSlice.actions;
 
 const rideRequestsListReducer = rideRequestsListSlice.reducer;
 export default rideRequestsListReducer

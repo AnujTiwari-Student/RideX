@@ -4,7 +4,7 @@ import { LocateFixed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CaptainRideDetailPanel from "./CaptainRideDetailPanel";
 import gsap from "gsap";
-import { deleteRide, fetchAllRides } from "@/features/rideRequestsListSlice";
+import { confirmRide, deleteRide, fetchAllRides } from "@/features/rideRequestsListSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { setAcceptedRideIndex, setRideAccepted, setRideAcceptedData } from "@/features/rideAcceptedSlice";
 
@@ -20,6 +20,7 @@ const IncomingRidePanel = ({
 
   const [rideDetailsPanel, setRideDetailsPanel] = useState(false);
   const {rideAccepted , rideAcceptedData, acceptedRideIndex} = useSelector((state)=> state.rideAccepted)
+  const { socket , connected } = useSelector((state)=> state.socket)
   
   const dispatch = useDispatch();
 
@@ -46,7 +47,7 @@ const IncomingRidePanel = ({
   const handleIgnore = (ride) => {
     console.log("Ignoring ride:", ride._id);
     dispatch(deleteRide(ride._id));
-  };  
+  };
 
   useEffect(() => {
     if (rideRequestsList.length === 0) {
@@ -55,12 +56,22 @@ const IncomingRidePanel = ({
   }, [rideRequestsList]);
 
   const handleAccept = (ride) => {
-    console.log("Accepting ride:", ride._id);
-    dispatch(setRideAccepted(true));
-    dispatch(setAcceptedRideIndex(ride._id));
-    dispatch(setRideAcceptedData(ride));
-    setRideDetailsPanel(true);
+    if (socket && connected) {
+      dispatch(confirmRide(ride._id))
+        .unwrap()
+        .then((res) => {
+          console.log("Ride confirmed successfully on backend:", res);
+          dispatch(setRideAccepted(true));
+          dispatch(setAcceptedRideIndex(ride._id));
+          dispatch(setRideAcceptedData(ride));
+          setRideDetailsPanel(true);
+        })
+        .catch((err) => {
+          console.error("Error confirming ride:", err);
+        });
+    }
   };
+  
 
   useEffect(()=>{
     console.log("Accepted Ride Data:", rideAcceptedData);
@@ -71,11 +82,7 @@ const IncomingRidePanel = ({
     console.log("Viewing ride details Only:", latestRide?._id);
     console.log("Ride Accepted Data:", rideAcceptedData);
     setRideDetailsPanel(true);
-  }
-
-  // console.log("Accepted Ride Index:", acceptedRideIndex);
-  // console.log("Latest Ride ID:", latestRide?._id);
-  
+  };  
 
   useEffect(() => {
     setCurrentIndex(0); // Reset to latest when list updates

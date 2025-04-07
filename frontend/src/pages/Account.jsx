@@ -24,14 +24,13 @@ const Account = () => {
   const [vehiclePanel, setVehiclePanel] = useState(false)
   const [selectedVehiclePanel, setSelectedVehiclePanel] = useState(false)
   const [lookingForDriver, setLookingForDriver] = useState(false)
-  const [driverFound, setDriverFound] = useState(true)
+  const [driverFound, setDriverFound] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [focusField, setFocusField] = useState(null)
   
   const {rideFare , loading} = useSelector((state) => state.rideRequestsList)
   const {user} = useSelector((state)=> state.user)
   const {socket , connected} = useSelector((state) => state.socket);
-  const {rideAccepted} = useSelector((state)=> state.rideAccepted)
 
    const currentUser = user ;
 
@@ -48,6 +47,25 @@ const Account = () => {
     })
     dispatch(locationSuggestion( e.target.value ));
   }
+
+    useEffect(()=>{
+      
+      if (!socket || !connected) return;
+
+      const handleRideConfirmed = (data) => {
+        console.log("Ride confirmed: ", data);
+        setLookingForDriver(false);
+        setDriverFound(true);
+      };
+    
+      socket.on("ride-confirmed", handleRideConfirmed);
+      console.log("Listening for ride-confirmed event...");
+    
+      return () => {
+        socket.off("ride-confirmed", handleRideConfirmed);
+        console.log("Removed ride-confirmed listener");
+      };
+    } , [socket , connected])
 
   const panelCloseRef = useRef(null)
   const panelRef = useRef(null)

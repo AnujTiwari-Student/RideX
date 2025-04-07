@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../features/userSlice";
@@ -10,11 +10,13 @@ const UserLogin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      navigate("/account", { replace: true });
-    }
-  }, [navigate]);
+  const token = localStorage.getItem("token");
+
+  // useLayoutEffect(() => {
+  //   if (token) {
+  //     navigate("/account");
+  //   }
+  // }, [navigate]);
 
   const { loading } = useSelector((state) => state.user);
 

@@ -34,23 +34,24 @@ module.exports.isCaptain = async (req, res, next) => {
 
         const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
         if (!token) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({ message: 'Captain Unauthorized' });
         }
     
         const isBlacklisted = await blacklistTokenModel.findOne({ token: token});
         if (isBlacklisted) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({ message: 'Blacklisted Token' });
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const captain = await captainModel.findById(decoded._id);
         if (!captain) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({ message: 'Token Validation Failed' });
         }
         req.captain = captain;
         next();
 
     } catch (error) {
+        console.log(error.message)
         return res.status(401).json({ message: 'Unauthorized' });
     }
 }

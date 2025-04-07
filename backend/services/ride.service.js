@@ -111,3 +111,24 @@ module.exports.deleteRide = async (rideId) => {
   const ride = await rideModel.findByIdAndDelete(rideId);
   return ride;
 }
+
+module.exports.confirmRide = async (rideId , captainId) => {
+  
+  if(!rideId){
+    throw new Error('Invalid ride id')
+  }
+
+  await rideModel.findOneAndUpdate(
+    { _id: rideId },
+    { $set: { captain: captainId, status: "confirmed" } },
+    { new: true },
+  );
+
+  const ride = await rideModel.findById(rideId).populate('user').populate('captain')
+
+  if (!ride) {
+    throw new Error('Ride not found')
+  }
+
+  return ride;
+}
