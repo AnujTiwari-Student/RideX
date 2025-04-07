@@ -52,6 +52,8 @@ const IncomingRidePanel = ({
   useEffect(() => {
     if (rideRequestsList.length === 0) {
       setIncomingRidePanel(false);
+    }else if (rideRequestsList.length === 1) {
+      setIncomingRidePanel(true);
     }
   }, [rideRequestsList]);
 

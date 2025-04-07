@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import IncomingRidePanel from "./IncomingRidePanel";
 import gsap from "gsap";
 
-const CaptainDetail = ({rideRequestsList , paymentMethod , socket , connected}) => {
+const CaptainDetail = ({rideRequestsList , paymentMethod}) => {
 
     const navigate = useNavigate()
 

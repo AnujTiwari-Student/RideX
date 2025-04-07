@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import '../App.css'
 import mapImage from '../assets/image/Map.jpeg'
 import { useDispatch, useSelector } from 'react-redux'
@@ -15,6 +15,8 @@ import { Flag, Menu } from 'lucide-react'
 import UserNavBar from '@/components/UserNavBar'
 import axios from 'axios'
 import { sendMessage } from '@/features/socketSlice'
+import { setRideRequest } from '@/features/rideRequestSlice'
+import { setCaptainData } from '@/features/rideRequestsListSlice'
 
 const Account = () => {
   const dispatch = useDispatch()
@@ -28,7 +30,7 @@ const Account = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [focusField, setFocusField] = useState(null)
   
-  const {rideFare , loading} = useSelector((state) => state.rideRequestsList)
+  const { rideFare , loading , captainData } = useSelector((state) => state.rideRequestsList)
   const {user} = useSelector((state)=> state.user)
   const {socket , connected} = useSelector((state) => state.socket);
 
@@ -40,6 +42,10 @@ const Account = () => {
     locationSuggestion: "",
   })
 
+  useEffect(()=>{
+    console.log("Captain Data: ", captainData)
+  }, [captainData])
+
   const handleChange = (e) => {
     setUserLocation({
       ...userLocation,
@@ -48,12 +54,20 @@ const Account = () => {
     dispatch(locationSuggestion( e.target.value ));
   }
 
-    useEffect(()=>{
-      
-      if (!socket || !connected) return;
+    console.log("User Socket ID: ", user?.socketId)
+    console.log("Socket ID Connected: ", socket?.id)
 
+    useLayoutEffect(()=>{
+      console.log("Socket and connection state changed...");
+      console.log("socket:", socket);
+      console.log("connected:", connected);
+      if (!socket || !connected) {
+        console.log("Socket not connected yet.");
+        return;
+      }
       const handleRideConfirmed = (data) => {
         console.log("Ride confirmed: ", data);
+        dispatch(setCaptainData(data.captain))
         setLookingForDriver(false);
         setDriverFound(true);
       };
@@ -65,7 +79,7 @@ const Account = () => {
         socket.off("ride-confirmed", handleRideConfirmed);
         console.log("Removed ride-confirmed listener");
       };
-    } , [socket , connected])
+    } , [socket , connected , dispatch])
 
   const panelCloseRef = useRef(null)
   const panelRef = useRef(null)
@@ -77,6 +91,8 @@ const Account = () => {
 
   useEffect(()=>{
     dispatch(sendMessage("join" , {userType: currentUser?.user?.role, userId: currentUser?.user?._id}))
+    console.log("User Socket ID: ", currentUser?.socketId)
+    console.log("Socket ID Connected: ", socket?.id)
   }, [dispatch, currentUser])
 
   useEffect(() => { 
@@ -118,8 +134,8 @@ const Account = () => {
       {
         ref: driverFoundRef,
         state: driverFound,
-        animation: { transform: "translateY(100%)" },
-        reverse: { transform: "translateY(0)" },
+        animation: { transform: "translateY(0)" },
+        reverse: { transform: "translateY(100%)" },
       },
       {
         ref: lookingForDriverRef,
@@ -218,7 +234,7 @@ const Account = () => {
         <LookingForDriver />
       </div>
       <div ref={driverFoundRef} className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl translate-y-full`}>
-        <DriverFound driverFound={setDriverFound} />
+        <DriverFound driverFound={setDriverFound}  />
       </div>
       <div
         ref={menuRef}

@@ -112,7 +112,7 @@ const CaptainAccount = () => {
       <div
         className={`fixed bottom-0 z-10 w-full bg-white rounded-t-3xl`}
       >
-        <CaptainDetail rideRequestsList={rideRequestsList} paymentMethod={paymentMethod} socket={socket} connected={connected} />
+        <CaptainDetail rideRequestsList={rideRequestsList} paymentMethod={paymentMethod} />
       </div>
 
       <div

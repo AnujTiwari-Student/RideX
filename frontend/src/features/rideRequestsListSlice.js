@@ -3,7 +3,7 @@ import axios from "axios";
 
 const initialState = {
     rideRequestsList: [],
-    captain: null,
+    captainData: null,
     rideFare: null,
     loading: false,
     error: null,
@@ -47,7 +47,7 @@ export const createRide = createAsyncThunk(
                     },
                 })
                 console.log('API Response:', response.data);
-                dispatch(setCaptain(response.data.captain))
+                // dispatch(setCaptain(response.data.captain))
                 return response.data
             }catch (error) {
                 console.log('API Error:', error);
@@ -144,8 +144,8 @@ const rideRequestsListSlice = createSlice({
                 state.rideRequestsList.push(newRide); 
             }
         }, 
-        setCaptain: (state, action) => {
-            state.captain = action.payload;
+        setCaptainData: (state, action) => {
+            state.captainData = action.payload;
         },       
     },
     extraReducers: (builder) => {
@@ -179,7 +179,7 @@ const rideRequestsListSlice = createSlice({
     }
 })
 
-export const { setRideRequestsList , addRideRequest , setCaptain } = rideRequestsListSlice.actions;
+export const { setRideRequestsList , addRideRequest , setCaptainData } = rideRequestsListSlice.actions;
 
 const rideRequestsListReducer = rideRequestsListSlice.reducer;
 export default rideRequestsListReducer

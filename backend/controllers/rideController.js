@@ -107,7 +107,7 @@ module.exports.confirmRide = async (req, res) => {
         if(!ride){
             return res.status(404).json({message: "Ride not found"})
         }
-        console.log("ride.rideId: ", ride.user.socketId)
+        console.log("User Socket ID: ", ride.user.socketId)
         console.log("Ride: ", ride)
         sendMessageToSocketId(ride.user.socketId , {
             event: 'ride-confirmed',

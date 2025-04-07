@@ -10,13 +10,13 @@ const UserLogin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const token = localStorage.getItem("token");
-
-  // useLayoutEffect(() => {
-  //   if (token) {
-  //     navigate("/account");
-  //   }
-  // }, [navigate]);
+  useLayoutEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token && window.location.pathname !== "/account") {
+      navigate("/account");
+    }
+  }, [navigate]);
+  
 
   const { loading } = useSelector((state) => state.user);
 

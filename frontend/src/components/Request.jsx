@@ -6,7 +6,7 @@ import { useSelector , useDispatch } from "react-redux";
 import { setAcceptedRideIndex, setRideAccepted, setRideAcceptedData, setRideId } from "@/features/rideAcceptedSlice";
 import { nanoid } from "@reduxjs/toolkit";
 
-const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index}) => {
+const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index , handleRideAccept}) => {
 
 
   const dispatch = useDispatch()
@@ -14,16 +14,19 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
 
   const [showButton, setShowButton] = useState(false);
   const [rideDetailsPanel, setRideDetailsPanel] = useState(false);
-
-  const {rideAccepted} = useSelector((state)=> state.rideAccepted)
-  const {rideId} = useSelector((state)=> state.rideAccepted)
-  const {acceptedRideIndex , rideAcceptedData} = useSelector((state)=> state.rideAccepted)
+  
+  const { acceptedRideIndex , rideAcceptedData , rideAccepted } = useSelector((state)=> state.rideAccepted)
 
   const rideDetailsPanelRef = useRef(null);
 
   const handleIgnore = (_id) => {
     onRemove(_id)  
   };
+
+  const handleAccept = (ride) => {
+    handleRideAccept(ride)
+    dispatch(setRideDetailsPanel(true))
+  }  
 
   useEffect(() => {
     if (rideDetailsPanel) {
@@ -136,10 +139,7 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index})
 
                 <button
                   onClick={() => {
-                    setRideDetailsPanel(true);
-                    dispatch(setRideAccepted(true));
-                    dispatch(setAcceptedRideIndex(ride._id));
-                    dispatch(setRideAcceptedData(ride));
+                    handleAccept(ride);
                   }}
                   disabled={rideAccepted && ride._id !== acceptedRideIndex}
                   className={`w-1/2 px-4 py-2 text-black font-semibold rounded-lg ${

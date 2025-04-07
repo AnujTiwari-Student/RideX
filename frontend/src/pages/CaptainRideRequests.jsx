@@ -5,7 +5,8 @@ import { ArrowLeft, Menu } from "lucide-react";
 import Request from "@/components/Request";
 import CaptainNavBar from "@/components/CaptainNavBar";
 import gsap from "gsap";
-import { createRide, deleteRide } from "@/features/rideRequestsListSlice";
+import { confirmRide, createRide, deleteRide } from "@/features/rideRequestsListSlice";
+import { setAcceptedRideIndex, setRideAccepted, setRideAcceptedData } from "@/features/rideAcceptedSlice";
 
 const AllRideRequest = () => {
   const rideRequests = [
@@ -107,6 +108,7 @@ const AllRideRequest = () => {
   
 
   const rideRequestsList = useSelector((state) => state.rideRequestsList.rideRequestsList);
+  const { socket, connected } = useSelector((state) => state.socket);
   useEffect(() => {
     console.log("Ride Requests List at captain dashboard:", rideRequestsList);
   }, [rideRequestsList]);
@@ -125,6 +127,23 @@ const AllRideRequest = () => {
     dispatch(deleteRide(_id)) 
     setRemovedCard((prevRequest)=> prevRequest.filter((ride)=> ride._id !== _id))
   }
+
+
+  const handleRideAccept = (ride) => {
+    if (socket && connected) {
+      dispatch(confirmRide(ride._id))
+        .unwrap()
+        .then((res) => {
+          console.log("Ride confirmed successfully on backend:", res);
+          dispatch(setRideAccepted(true));
+          dispatch(setAcceptedRideIndex(ride._id));
+          dispatch(setRideAcceptedData(ride));
+        })
+        .catch((err) => {
+          console.log("Error confirming ride:", err);
+        });
+    }
+  };
 
   const [menuOpen, setMenuOpen] = useState(false)
   
@@ -173,7 +192,7 @@ const AllRideRequest = () => {
       </div>
       <div className="ride-requests-container bg-gray-200">
         {removedCard.map((ride, index) => (
-          <Request key={ride._id} rideRequestsList={rideRequestsList} index={index} ride={ride} onRemove={handleRemove} totalRequests={removedCard} />
+          <Request key={ride._id} handleRideAccept={handleRideAccept} rideRequestsList={rideRequestsList} index={index} ride={ride} onRemove={handleRemove} totalRequests={removedCard} />
         ))}
       </div>
       <div
