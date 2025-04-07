@@ -19,7 +19,7 @@ export const createConnection = createAsyncThunk(
         socket.on('connect', () => {
             dispatch(setConnected(true));
             dispatch(setSocket(socket));
-            console.log('Connected to server');
+            console.log('Connected to server with socket ID:', socket.id);
         });
 
         socket.on('disconnect', () => {
@@ -80,7 +80,11 @@ export const updateLocation = () => (dispatch, getState) => {
 }
 
 export const sendMessage = (eventName, message) => (dispatch , getState) => {
-    const { socket } = getState().socket;
+    const { socket , connected } = getState().socket;
+    if (!socket || !connected) {
+        console.warn("Socket not connected. Unable to send message.");
+        return;
+    }
     if (socket) {
         console.log(`Sending message: ${eventName}`, message);
         socket.emit(eventName, message);

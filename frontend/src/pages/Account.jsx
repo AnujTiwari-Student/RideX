@@ -57,30 +57,6 @@ const Account = () => {
     console.log("User Socket ID: ", user?.socketId)
     console.log("Socket ID Connected: ", socket?.id)
 
-    useLayoutEffect(()=>{
-      console.log("Socket and connection state changed...");
-      console.log("socket:", socket);
-      console.log("connected:", connected);
-      if (!socket || !connected) {
-        console.log("Socket not connected yet.");
-        return;
-      }
-      const handleRideConfirmed = (data) => {
-        console.log("Ride confirmed: ", data);
-        dispatch(setCaptainData(data.captain))
-        setLookingForDriver(false);
-        setDriverFound(true);
-      };
-    
-      socket.on("ride-confirmed", handleRideConfirmed);
-      console.log("Listening for ride-confirmed event...");
-    
-      return () => {
-        socket.off("ride-confirmed", handleRideConfirmed);
-        console.log("Removed ride-confirmed listener");
-      };
-    } , [socket , connected , dispatch])
-
   const panelCloseRef = useRef(null)
   const panelRef = useRef(null)
   const vehiclePanelRef = useRef(null)
@@ -90,10 +66,35 @@ const Account = () => {
   const menuRef = useRef(null)
 
   useEffect(()=>{
+
+    if (!socket || !connected || !currentUser?.user?._id) return;
+
     dispatch(sendMessage("join" , {userType: currentUser?.user?.role, userId: currentUser?.user?._id}))
-    console.log("User Socket ID: ", currentUser?.socketId)
+
     console.log("Socket ID Connected: ", socket?.id)
-  }, [dispatch, currentUser])
+
+    console.log("Socket and connection state changed...");
+    console.log("socket:", socket);
+    console.log("connected:", connected);
+    if (!socket || !connected) {
+      console.log("Socket not connected yet.");
+      return;
+    }
+    const handleRideConfirmed = (data) => {
+      console.log("Ride confirmed: ", data);
+      dispatch(setCaptainData(data.captain))
+      setLookingForDriver(false);
+      setDriverFound(true);
+    };
+  
+    socket.on("ride-confirmed", handleRideConfirmed);
+    console.log("Listening for ride-confirmed event...");
+  
+    return () => {
+      socket.off("ride-confirmed", handleRideConfirmed);
+      console.log("Removed ride-confirmed listener");
+    };
+  }, [dispatch, currentUser , socket, connected])
 
   useEffect(() => { 
       if (menuOpen) {

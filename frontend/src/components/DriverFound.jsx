@@ -9,9 +9,34 @@ const DriverFound = ({driverFound}) => {
 
     const dispatch = useDispatch()
 
+    const {captainData} = useSelector((state) => state.rideRequestsList)
+
     const [messagePanelOpen, setMessagePanelOpen] = useState(false);
   
     const messagePanelRef = useRef(null);
+
+    async function getPlaceFromLatLng(lat, lng) {
+      const apiKey = import.meta.env.Google_Maps_Api_Key; 
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+    
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+    
+        if (data.status === 'OK') {
+          const address = data.results[0].formatted_address;
+          console.log('Address:', address);
+          return address;
+        } else {
+          console.error('Geocoding failed:', data.status);
+          return null;
+        }
+      } catch (error) {
+        console.error('Error fetching location:', error);
+        return null;
+      }
+    }
+    
 
     useEffect(() => {
       if(messagePanelOpen){
@@ -46,9 +71,9 @@ const DriverFound = ({driverFound}) => {
           </div>
         </div>
         <div className='flex flex-col items-end'>
-          <h3 className='text-gray-600 font-bold text-large'>Anuj</h3>
-          <h2 className='text-lg font-bold'>KA15AK00-0</h2>
-          <h6 className='text-gray-500 font-semibold text-sm'>Gray Mercedes S-Presso LXI</h6>
+          <h3 className='text-gray-600 font-bold text-large'>{captainData?.firstname} {captainData?.lastname}</h3>
+          <h2 className='text-lg font-bold'>{captainData?.vehiclePlate}</h2>
+          <h6 className='text-gray-500 font-semibold text-sm'>{captainData?.vehicleColor} Mercedes S-Presso LXI</h6>
           <p className='text-gray-600 font-bold text-base flex gap-2 mt-1'><Star fill='black' size={20} /> 4.9</p>
         </div>
       </div>
@@ -81,7 +106,7 @@ const DriverFound = ({driverFound}) => {
                 <h5 className='text-black'><i className="ri-map-pin-2-fill text-xl"></i></h5>
             </div>
             <h4 className='text-large font-medium'>
-                24B, Near Kapoors Cafe , New Delhi, Uttar Pradesh, India
+                {/* {getPlaceFromLatLng(captainData?.location?.lat , captainData?.location?.lng)} */}
             </h4>
         </div>
       </div>
