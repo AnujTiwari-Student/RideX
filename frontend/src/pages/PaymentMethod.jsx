@@ -8,13 +8,15 @@ import Switch from '@mui/material/Switch/Switch';
 const PaymentMethod = () => {
 
     const paymentMethod = useSelector((state)=>state.payment.paymentMethod)
+    const {selectedVehiclePanel} = useSelector((state)=> state.selectedVehicle)
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleSelect = (method) => {
         dispatch(setPaymentMethod(method));
-        navigate("/ride-details");
+        dispatch(selectedVehiclePanel(true));
+        navigate("/account");
     };
 
   return (

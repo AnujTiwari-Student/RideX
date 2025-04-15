@@ -25,9 +25,9 @@ const MessagePanel = ({ setMessagePanelOpen }) => {
   };
 
   return (
-    <div className="bg-gray-100 h-screen flex flex-col">
+    <div className="bg-gray-100 h-screen flex flex-col z-[2000]">
       {/* Header */}
-      <div className="flex items-center gap-32 px-4 py-4 w-full bg-white">
+      <div className="flex items-center gap-32 z-[2000] px-4 py-4 w-full bg-white">
         <ArrowLeft onClick={() => setMessagePanelOpen(false)} className="cursor-pointer" />
         <h3 className="text-xl font-bold text-center">Anuj</h3>
       </div>

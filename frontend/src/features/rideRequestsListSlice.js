@@ -4,6 +4,7 @@ import axios from "axios";
 const initialState = {
     rideRequestsList: [],
     captainData: null,
+    otp: null,
     rideFare: null,
     loading: false,
     error: null,
@@ -47,7 +48,6 @@ export const createRide = createAsyncThunk(
                     },
                 })
                 console.log('API Response:', response.data);
-                // dispatch(setCaptain(response.data.captain))
                 return response.data
             }catch (error) {
                 console.log('API Error:', error);
@@ -82,7 +82,7 @@ export const fetchAllRides = createAsyncThunk(
 
 export const deleteRide = createAsyncThunk(
     'rides/deleteRide',
-    async (rideId, { dispatch, rejectWithValue , getState }) => {
+    async (rideId, { dispatch, rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -130,6 +130,31 @@ export const confirmRide = createAsyncThunk(
     }
 )
 
+export const cancelRide = createAsyncThunk(
+    'rides/cancelRide',
+    async (rideId, { rejectWithValue }) => {
+
+        try {
+            const token = localStorage.getItem('captainToken');
+            if (!token) {
+                console.log("No authentication token found!");
+                return rejectWithValue({ message: "No authentication token" });
+            }
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/ride/cancel-ride`, {rideId}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            console.log('Canceling Ride:', rideId);
+            console.log('Cancel API Response:', response.data);
+            return response.data
+        }catch (error) {
+            console.log('API Error:', error);
+            return rejectWithValue({ message: error.message });
+        }
+    }
+)
+
 const rideRequestsListSlice = createSlice({
     name: "rideRequestsList",
     initialState,
@@ -146,7 +171,10 @@ const rideRequestsListSlice = createSlice({
         }, 
         setCaptainData: (state, action) => {
             state.captainData = action.payload;
-        },       
+        }, 
+        setOtp: (state, action) => {
+            state.otp = action.payload;
+        },      
     },
     extraReducers: (builder) => {
         builder
@@ -176,10 +204,27 @@ const rideRequestsListSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             });
+        builder
+            .addCase(cancelRide.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(cancelRide.fulfilled, (state, action) => {
+                state.loading = false;
+                state.captainData = null;
+                state.otp = null;
+                state.rideFare = null;
+                state.rideRequestsList = state.rideRequestsList.filter(ride => ride._id !== action.payload._id);
+                state.error = null;
+            })
+            .addCase(cancelRide.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     }
 })
 
-export const { setRideRequestsList , addRideRequest , setCaptainData } = rideRequestsListSlice.actions;
+export const { setRideRequestsList , addRideRequest , setCaptainData , setOtp } = rideRequestsListSlice.actions;
 
 const rideRequestsListReducer = rideRequestsListSlice.reducer;
 export default rideRequestsListReducer

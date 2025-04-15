@@ -49,7 +49,7 @@ export const createConnection = createAsyncThunk(
     }
 );
 
-export const updateLocation = () => (dispatch, getState) => {
+export const updateLocation = () => async (dispatch, getState) => {
     const { socket } = getState().socket;
     const { captain } = getState().captain;
     console.log(`User: `, captain)
@@ -63,10 +63,13 @@ export const updateLocation = () => (dispatch, getState) => {
     if(socket && captain?.captain?._id){
         if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition((position) => {
+                console.log("Position: ", position)
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
                 const locationData = {
                     location:{
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
+                        lat,
+                        lng,
                     },
                     userId: captain.captain._id,
                     token: captain.token,
@@ -90,6 +93,7 @@ export const sendMessage = (eventName, message) => (dispatch , getState) => {
         socket.emit(eventName, message);
     }
 };
+  
 
 const socketSlice = createSlice({
     name: 'socket',

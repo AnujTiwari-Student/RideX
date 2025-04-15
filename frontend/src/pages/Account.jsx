@@ -16,7 +16,8 @@ import UserNavBar from '@/components/UserNavBar'
 import axios from 'axios'
 import { sendMessage } from '@/features/socketSlice'
 import { setRideRequest } from '@/features/rideRequestSlice'
-import { setCaptainData } from '@/features/rideRequestsListSlice'
+import { cancelRide, setCaptainData, setOtp } from '@/features/rideRequestsListSlice'
+import toast from 'react-hot-toast'
 
 const Account = () => {
   const dispatch = useDispatch()
@@ -29,6 +30,7 @@ const Account = () => {
   const [driverFound, setDriverFound] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [focusField, setFocusField] = useState(null)
+  const [rideData , setRideData] = useState(null)
   
   const { rideFare , loading , captainData } = useSelector((state) => state.rideRequestsList)
   const {user} = useSelector((state)=> state.user)
@@ -67,27 +69,39 @@ const Account = () => {
 
   useEffect(()=>{
 
-    if (!socket || !connected || !currentUser?.user?._id) return;
-
-    dispatch(sendMessage("join" , {userType: currentUser?.user?.role, userId: currentUser?.user?._id}))
-
-    console.log("Socket ID Connected: ", socket?.id)
-
-    console.log("Socket and connection state changed...");
-    console.log("socket:", socket);
-    console.log("connected:", connected);
-    if (!socket || !connected) {
+    if (!socket || !connected || !currentUser?.user?._id) {
       console.log("Socket not connected yet.");
       return;
     }
+
+    dispatch(sendMessage("join" , {userType: currentUser?.user?.role, userId: currentUser?.user?._id}))
+    
     const handleRideConfirmed = (data) => {
       console.log("Ride confirmed: ", data);
+      setRideData(data)
+      toast.success("Ride confirmed successfully")
+      dispatch(setOtp(data.otp))
       dispatch(setCaptainData(data.captain))
       setLookingForDriver(false);
       setDriverFound(true);
     };
+
+    const handleCancelRide = (data) => {
+      console.log("Ride cancelled: ", data);
+      setLookingForDriver(false);
+      setDriverFound(false);
+      setVehiclePanel(false);
+      toast.error("Ride cancelled by Captain")
+      setUserLocation({
+        pickup: "",
+        destination: "",
+      })
+      dispatch(setCaptainData(null))
+      dispatch(setOtp(null))
+    }
   
     socket.on("ride-confirmed", handleRideConfirmed);
+    socket.on("ride-cancelled", handleCancelRide);
     console.log("Listening for ride-confirmed event...");
   
     return () => {
@@ -170,7 +184,7 @@ const Account = () => {
       <div style={{backgroundImage: `url(${mapImage})`}} className="h-full w-screen bg-cover bg-center py-2 px-4">
         <div onClick={()=>{
           setMenuOpen(true)
-        }} className="bg-transparent p-3 rounded-full w-max cursor-pointer z-[1050] relative">
+        }} className="bg-transparent p-3 rounded-full w-max cursor-pointer z-[10] relative">
           {panelOpen ? null : <Menu />}
         </div>
       </div>

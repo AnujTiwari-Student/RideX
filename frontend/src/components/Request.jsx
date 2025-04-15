@@ -5,8 +5,9 @@ import CaptainRideDetailPanel from "./CaptainRideDetailPanel";
 import { useSelector , useDispatch } from "react-redux";
 import { setAcceptedRideIndex, setRideAccepted, setRideAcceptedData, setRideId } from "@/features/rideAcceptedSlice";
 import { nanoid } from "@reduxjs/toolkit";
+import { confirmRide } from "@/features/rideRequestsListSlice";
 
-const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index , handleRideAccept}) => {
+const Request = ({ ride , onRemove , totalRequests  , index }) => {
 
 
   const dispatch = useDispatch()
@@ -16,6 +17,7 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index ,
   const [rideDetailsPanel, setRideDetailsPanel] = useState(false);
   
   const { acceptedRideIndex , rideAcceptedData , rideAccepted } = useSelector((state)=> state.rideAccepted)
+  const { socket , connected } = useSelector((state)=> state.socket)
 
   const rideDetailsPanelRef = useRef(null);
 
@@ -24,8 +26,20 @@ const Request = ({ rideRequestsList , ride , onRemove , totalRequests  , index ,
   };
 
   const handleAccept = (ride) => {
-    handleRideAccept(ride)
-    dispatch(setRideDetailsPanel(true))
+    if (socket && connected) {
+          dispatch(confirmRide(ride._id))
+            .unwrap()
+            .then((res) => {
+              console.log("Ride confirmed successfully on backend:", res);
+              dispatch(setRideAccepted(true));
+              dispatch(setAcceptedRideIndex(ride._id));
+              dispatch(setRideAcceptedData(ride));
+              setRideDetailsPanel(true);
+            })
+            .catch((err) => {
+              console.error("Error confirming ride:", err);
+            });
+        }
   }  
 
   useEffect(() => {

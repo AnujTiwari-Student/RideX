@@ -61,12 +61,14 @@ const captainSchema = new mongoose.Schema({
     type: Number,
   },
   role: String,
+  vehicleModel:{
+    type: String,
+    // required: true,
+  }
 });
 
 captainSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: "24h",
-  });
+  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET);
   return token;
 };
 

@@ -6,12 +6,11 @@ import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import MessagePanel from "./MessagePanel";
 import gsap from "gsap";
-import { deleteRide } from "@/features/rideRequestsListSlice";
+import { cancelRide, deleteRide } from "@/features/rideRequestsListSlice";
 
 const CaptainRideDetailPanel = ({
   setRideDetailsPanel,
   rideAcceptedData,
-  paymentMethod,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -22,8 +21,8 @@ const CaptainRideDetailPanel = ({
 
   const messagePanelRef = useRef(null);
 
-  let discount = 10; // Example discount value
-  let totalFare = rideAcceptedData?.fare - discount; // Calculate total fare after discount
+  let discount = 10; 
+  let totalFare = rideAcceptedData?.fare - discount; 
 
   useEffect(() => {
     console.log("Ride Accepted Data:", rideAcceptedData?._id);
@@ -40,6 +39,20 @@ const CaptainRideDetailPanel = ({
       })
     }
     }, [messagePanelOpen])
+
+  const handleCancelRide = (ride) => {
+    dispatch(cancelRide(ride?._id))
+    .unwrap()
+    .then(() => {
+      setRideDetailsPanel(false);
+      dispatch(setRideAccepted(false));
+      dispatch(setAcceptedRideIndex(null))
+      dispatch(setRideAcceptedData(null));
+      toast.success("Ride cancelled successfully");
+    }).catch((error) => {
+      console.log("Error cancelling ride:", error);
+    });
+  };
 
   return (
     <div className="h-full overflow-scroll">
@@ -148,11 +161,7 @@ const CaptainRideDetailPanel = ({
         </div>
         <div
           onClick={() => {
-            setRideDetailsPanel(false);
-            dispatch(deleteRide(rideAcceptedData?._id));
-            dispatch(setRideAccepted(false));
-            dispatch(setAcceptedRideIndex(null))
-            dispatch(setRideAcceptedData(null));
+            handleCancelRide(rideAcceptedData);
           }}
           className="flex flex-col py-3 gap-1 w-24 items-center rounded-xl bg-gray-400"
         >

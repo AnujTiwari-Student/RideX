@@ -9,7 +9,6 @@ const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
   const dispatch = useDispatch();
 
   const {selectedVehicleFare} = useSelector((state) => state.selectedVehicle);
-  // console.log(selectedVehicleFare);
   const vehicleType = useSelector((state) => state.selectedVehicle.selectedVehicle);
   const {pickup , destination} = useSelector((state) => state.userLocation);
 
@@ -64,7 +63,6 @@ const SelectedVehiclePanel = ({ selectedVehiclePanel , lookingForDriver }) => {
                 {/* <Link to='/user/payment-method'>
                   <ChevronRight />
                 </Link> */}
-                <h6 className='text-xs text-gray-800'>Can be change later</h6>
             </div>
         </div>
         <button onClick={()=>{

@@ -124,7 +124,70 @@ module.exports.confirmRide = async (rideId , captainId) => {
     { new: true },
   );
 
-  const ride = await rideModel.findById(rideId).populate('user').populate('captain')
+  const ride = await rideModel.findById(rideId).populate('user').populate('captain').select('+otp');
+
+  if (!ride) {
+    throw new Error('Ride not found')
+  }
+
+  return ride;
+}
+
+module.exports.startRide = async (rideId, otp) => {
+  if(!rideId || !otp){
+    throw new Error('Invalid ride id or otp')
+  }
+
+  await rideModel.findOneAndUpdate(
+    { _id: rideId },
+    { $set: { status: "ongoing" } },
+    { new: true },
+  );
+
+  const ride = await rideModel.findById(rideId).populate('user').populate('captain').select('+otp');
+
+  if (!ride) {
+    throw new Error('Ride not found')
+  }
+  if (ride.otp !== otp) {
+    throw new Error('Invalid OTP')
+  }
+
+  return ride;
+}
+
+module.exports.cancelRide = async (rideId) => {
+  if(!rideId){
+    throw new Error('Invalid ride id')
+  }
+
+  await rideModel.findOneAndUpdate(
+    { _id: rideId },
+    { $set: { status: "cancelled" , message: "Ride cancelled" } },
+    { new: true },
+  );
+
+  const ride = await rideModel.findById(rideId).populate('user').populate('captain').select('-otp');
+
+  if (!ride) {
+    throw new Error('Ride not found')
+  }
+
+  return ride;
+}
+
+module.exports.finishRide = async (rideId) => {
+  if(!rideId){
+    throw new Error('Invalid ride id')
+  }
+
+  await rideModel.findOneAndUpdate(
+    { _id: rideId },
+    { $set: { status: "completed" } },
+    { new: true },
+  );
+
+  const ride = await rideModel.findById(rideId).populate('user').populate('captain').select('-otp');
 
   if (!ride) {
     throw new Error('Ride not found')

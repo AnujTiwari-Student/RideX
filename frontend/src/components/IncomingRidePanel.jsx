@@ -4,9 +4,10 @@ import { LocateFixed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CaptainRideDetailPanel from "./CaptainRideDetailPanel";
 import gsap from "gsap";
-import { confirmRide, deleteRide, fetchAllRides } from "@/features/rideRequestsListSlice";
+import { cancelRide, confirmRide, deleteRide, fetchAllRides } from "@/features/rideRequestsListSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { setAcceptedRideIndex, setRideAccepted, setRideAcceptedData } from "@/features/rideAcceptedSlice";
+import toast from "react-hot-toast";
 
 const IncomingRidePanel = ({
   rideRequestsList = [],
@@ -42,11 +43,12 @@ const IncomingRidePanel = ({
 
   useEffect(()=>{
     console.log("latest ride", latestRide)
+    console.log("Latest Ride ID:", latestRide?._id);
   }, [latestRide])
 
   const handleIgnore = (ride) => {
     console.log("Ignoring ride:", ride._id);
-    dispatch(deleteRide(ride._id));
+    dispatch(cancelRide(ride._id));
   };
 
   useEffect(() => {
@@ -59,10 +61,12 @@ const IncomingRidePanel = ({
 
   const handleAccept = (ride) => {
     if (socket && connected) {
+      console.log("Accepting ride:", ride._id);
       dispatch(confirmRide(ride._id))
         .unwrap()
         .then((res) => {
           console.log("Ride confirmed successfully on backend:", res);
+          toast.success("Ride accepted successfully");
           dispatch(setRideAccepted(true));
           dispatch(setAcceptedRideIndex(ride._id));
           dispatch(setRideAcceptedData(ride));

@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 
 const LookingForDriver = () => {
 
-  const {pickup , destination} = useSelector((state) => state.userLocation);
-  const {selectedVehicleFare} = useSelector((state) => state.selectedVehicle);
+  const  {pickup , destination } = useSelector((state) => state.userLocation);
+  const { selectedVehicleFare } = useSelector((state) => state.selectedVehicle);
 
   return (
     <div>

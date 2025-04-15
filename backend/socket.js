@@ -30,7 +30,7 @@ function initializeSocket(server) {
         socket.on('captain-location' , async (data) => {
             const { location , userId , token } = data;
 
-            if(!location || !userId || !token) return console.log("Invalid data")
+            if(!location || !userId || !token) return console.log("Invalid data") 
 
             // console.log("Location: ", location?.lat , location?.lng)
             // console.log("User Id: ", userId)

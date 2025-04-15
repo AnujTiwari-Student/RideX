@@ -52,7 +52,7 @@ module.exports.createRide = async (req, res) => {
 
 module.exports.fetchAllRides = async (req, res) => {
     try {
-        const rides = await rideModel.find().populate('user').select('-otp')
+        const rides = await rideModel.find({ status: { $ne: 'cancelled' } }).populate('user').select('-otp');
         // console.log("Rides: ", rides)
         res.status(200).json(rides)
     } catch (error) {
@@ -117,5 +117,85 @@ module.exports.confirmRide = async (req, res) => {
         res.status(200).json(ride)
     } catch (error) {
         res.status(500).json({message : error.message})
+    }
+}
+
+module.exports.startRide = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({errors: errors.array()})
+        }
+
+        const {rideId , otp} = req.body;
+
+        const ride = await rideService.startRide(rideId , otp)
+        if(!rideId && !otp){
+            return res.status(404).json({message: "Ride not found"})
+        }
+
+        console.log("User Socket ID: ", ride.user.socketId)
+        sendMessageToSocketId(ride.user.socketId , {
+            event: 'ride-started',
+            data: ride,
+        })
+
+        res.status(200).json(ride)
+    } catch (error) {
+        res.status(500).json({message : error.message})
+    }
+}
+
+module.exports.cancelRide = async (req , res)=>{
+    try {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({errors: errors.array()})
+        }
+
+        const {rideId} = req.body;
+
+        const ride = await rideService.cancelRide(rideId)
+        if(!ride){
+            return res.status(404).json({message: "Ride not found with ID: " + rideId})
+        }
+
+        sendMessageToSocketId(ride.user.socketId , {
+            event: 'ride-cancelled',
+            data: ride,
+        })
+
+        res.status(200).json(ride)
+        
+    } catch (error) {
+        console.log("Error: ", error)
+        res.status(500).json({message : error.message})   
+    }
+}
+
+module.exports.finishRide = async (req , res)=>{
+    try {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({errors: errors.array()})
+        }
+
+        const {rideId} = req.body;
+
+        const ride = await rideService.finishRide(rideId)
+        if(!ride){
+            return res.status(404).json({message: "Ride not found"})
+        }
+
+        console.log("User Socket ID: ", ride.user.socketId)
+        sendMessageToSocketId(ride.user.socketId , {
+            event: 'ride-ended',
+            data: ride,
+        })
+
+        res.status(200).json(ride)
+    } catch (error) {
+        console.log("Error: ", error)
+        res.status(500).json({message : error.message})   
     }
 }

@@ -5,109 +5,17 @@ import { ArrowLeft, Menu } from "lucide-react";
 import Request from "@/components/Request";
 import CaptainNavBar from "@/components/CaptainNavBar";
 import gsap from "gsap";
-import { confirmRide, createRide, deleteRide } from "@/features/rideRequestsListSlice";
+import { cancelRide, confirmRide } from "@/features/rideRequestsListSlice";
 import { setAcceptedRideIndex, setRideAccepted, setRideAcceptedData } from "@/features/rideAcceptedSlice";
 
 const AllRideRequest = () => {
-  const rideRequests = [
-    {
-      id: 1,
-      user: {
-        name: "Anuj Tiwari",
-        rating: 4.8,
-        image: "https://randomuser.me/api/portraits/men/1.jpg",
-      },
-      paymentType: "Cash",
-      fare: 25.0,
-      distance: "2.2 km",
-      pickup: {
-        address: "24B, Near Kapoors Cafe, New Delhi",
-        lat: 28.6129,
-        lng: 77.2295,
-      },
-      dropoff: {
-        address: "Connaught Place, New Delhi",
-        lat: 28.6328,
-        lng: 77.2197,
-      },
-      timestamp: "2023-07-25T10:30:00",
-    },
-    {
-      id: 2,
-      user: {
-        name: "Rahul Sharma",
-        rating: 4.5,
-        image: "https://randomuser.me/api/portraits/men/2.jpg",
-      },
-      paymentType: "Card",
-      fare: 18.5,
-      distance: "1.8 km",
-      pickup: {
-        address: "DLF Cyber City, Gurugram",
-        lat: 28.4962,
-        lng: 77.0943,
-      },
-      dropoff: {
-        address: "MG Road Metro Station, Gurugram",
-        lat: 28.4831,
-        lng: 77.0964,
-      },
-      timestamp: "2023-07-25T10:35:00",
-    },
-    {
-      id: 3,
-      user: {
-        name: "Priya Singh",
-        rating: 4.9,
-        image: "https://randomuser.me/api/portraits/women/1.jpg",
-      },
-      paymentType: "Cash",
-      fare: 32.0,
-      distance: "3.5 km",
-      pickup: {
-        address: "India Gate, New Delhi",
-        lat: 28.6129,
-        lng: 77.2295,
-      },
-      dropoff: {
-        address: "Lotus Temple, New Delhi",
-        lat: 28.5535,
-        lng: 77.2588,
-      },
-      timestamp: "2023-07-25T10:40:00",
-    },
-    {
-      id: 4,
-      user: {
-        name: "Amit Patel",
-        rating: 4.7,
-        image: "https://randomuser.me/api/portraits/men/3.jpg",
-      },
-      paymentType: "Card",
-      fare: 22.75,
-      distance: "2.7 km",
-      pickup: {
-        address: "Select Citywalk Mall, Saket",
-        lat: 28.5275,
-        lng: 77.219,
-      },
-      dropoff: {
-        address: "Hauz Khas Village, New Delhi",
-        lat: 28.5512,
-        lng: 77.1933,
-      },
-      timestamp: "2023-07-25T10:45:00",
-    },
-  ];
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [removedCard, setRemovedCard] = useState([])
+  const [removedCard, setRemovedCard] = useState([])  
 
-  
-
-  const rideRequestsList = useSelector((state) => state.rideRequestsList.rideRequestsList);
+  const { rideRequestsList } = useSelector((state) => state.rideRequestsList);
   const { socket, connected } = useSelector((state) => state.socket);
   useEffect(() => {
     console.log("Ride Requests List at captain dashboard:", rideRequestsList);
@@ -117,14 +25,11 @@ const AllRideRequest = () => {
     if(rideRequestsList.length > 0){
       setRemovedCard(rideRequestsList)
     }
-  }, [rideRequestsList])
-
-  // console.log("removedCard", removedCard);
-  
+  }, [rideRequestsList])  
 
   const handleRemove = (_id)=>{
     console.log("Removing ride with ID:", _id);
-    dispatch(deleteRide(_id)) 
+    dispatch(cancelRide(_id)) 
     setRemovedCard((prevRequest)=> prevRequest.filter((ride)=> ride._id !== _id))
   }
 
@@ -164,12 +69,6 @@ const AllRideRequest = () => {
         });
       }
     }, [menuOpen]);
-
-  useEffect(()=>{
-      if(!rideRequests.length > 1){
-          return navigate('/incoming-ride')
-      }
-  },[])
 
   return (
     <div className="h-screen overflow-y-scroll">
