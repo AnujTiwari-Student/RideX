@@ -18,6 +18,7 @@ import { sendMessage } from '@/features/socketSlice'
 import { setRideRequest } from '@/features/rideRequestSlice'
 import { cancelRide, setCaptainData, setOtp } from '@/features/rideRequestsListSlice'
 import toast from 'react-hot-toast'
+import LiveTracking from '@/components/LiveTracking'
 
 const Account = () => {
   const dispatch = useDispatch()
@@ -181,14 +182,17 @@ const Account = () => {
 
   return (
     <div className='h-screen relative'>
-      <div style={{backgroundImage: `url(${mapImage})`}} className="h-full w-screen bg-cover bg-center py-2 px-4">
+      <div className="fixed top-4 left-4 z-[1000] bg-transparent p-3 rounded-full cursor-pointer">
         <div onClick={()=>{
           setMenuOpen(true)
         }} className="bg-transparent p-3 rounded-full w-max cursor-pointer z-[10] relative">
           {panelOpen ? null : <Menu />}
         </div>
       </div>
-      <div className='h-screen fixed bottom-0 w-full flex flex-col justify-end'>
+      <div className="z-20 absolute h-full w-full">
+        <LiveTracking />
+      </div>
+      <div className='h-screen fixed bottom-0 w-full flex flex-col justify-end z-10'>
         <div className={`${panelOpen ? "h-[30%]" : "h-[35%]"} bg-white p-5 relative ${!panelOpen ? "rounded-t-3xl" : ""}`}>
           <div className='flex justify-between items-center'>
             <h4 className='text-xl font-semibold'>{panelOpen ? "Plan A Trip" : "Find A Trip"}</h4>

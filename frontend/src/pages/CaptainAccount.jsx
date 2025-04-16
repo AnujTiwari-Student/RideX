@@ -21,6 +21,7 @@ import CaptainNavBar from "@/components/CaptainNavBar";
 import { transform } from "framer-motion";
 import { sendMessage, updateLocation } from "@/features/socketSlice";
 import { addRideRequest, fetchAllRides } from "@/features/rideRequestsListSlice";
+import LiveTracking from "@/components/LiveTracking";
 
 const CaptainAccount = () => {
 
@@ -73,11 +74,11 @@ const CaptainAccount = () => {
     if(socket && connected){
       dispatch(updateLocation())
     }
-    // const locationInterval = setInterval(() => {
-    //   dispatch(updateLocation())
-    // } , 10000)
+    const locationInterval = setInterval(() => {
+      dispatch(updateLocation())
+    } , 10000)
 
-    // return () => clearInterval(locationInterval)
+    return () => clearInterval(locationInterval)
 
   }, [socket, connected, currentUser, dispatch])
 
@@ -101,12 +102,16 @@ const CaptainAccount = () => {
   return (
     <div className="h-screen">
 
-      <div style={{backgroundImage: `url(${mapImage})`}} className="h-full w-screen bg-cover bg-center py-2 px-4">
+      <div className="fixed top-4 left-4 z-[1000] bg-transparent p-3 rounded-full cursor-pointer">
         <div onClick={()=>{
           setMenuOpen(true)
         }} className="bg-transparent p-3 rounded-full w-max cursor-pointer">
           <Menu />
         </div>
+      </div>
+
+      <div className="absolute top-0 left-0 w-full h-full z-20">
+        <LiveTracking />
       </div>
 
       <div
@@ -117,7 +122,7 @@ const CaptainAccount = () => {
 
       <div
         ref={menuRef}
-        className={`fixed top-0 left-0 z-10 w-[80%] bg-white h-full translate-x-full`}
+        className={`fixed top-0 left-0 z-30 w-[80%] bg-white h-full translate-x-full`}
       >
         <CaptainNavBar setMenuOpen={setMenuOpen} />
       </div>
