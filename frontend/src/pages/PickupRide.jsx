@@ -8,7 +8,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { setDriverReached } from "@/features/driverReachedSlice";
 import { otpVerified } from "@/features/OTPVerificationSlice";
 import LiveTracking from "@/components/LiveTracking";
-import { getLocationCoordinates } from "@/features/trackingLocationSlice";
+import { getLocationCoordinates, setPickupPointCoordinates } from "@/features/trackingLocationSlice";
+import { finishRide } from "@/features/rideRequestsListSlice";
+import { setAcceptedRideIndex, setRideAccepted, setRideAcceptedData } from "@/features/rideAcceptedSlice";
+import toast from "react-hot-toast";
+import { setLastLocation } from "@/features/socketSlice";
 
 const PickupRide = () => {
   const navigate = useNavigate();
@@ -33,6 +37,7 @@ const PickupRide = () => {
   const [pickupRidePanelOpen, setPickupRidePanelOpen] = useState(false);
   const [otpPanel, setOtpPanel] = useState(false);
   const [pointReached, setPointReached] = useState(false);
+  const [rideFinished, setRideFinished] = useState(false)
 
   const pickupRidePanelRef = useRef(null);
   const otpPanelRef = useRef(null);
@@ -52,6 +57,25 @@ const PickupRide = () => {
       });
     }
   }, [otpPanel, pickupRidePanelOpen]);
+
+  const handleSubmit = (ride) => {
+    dispatch(finishRide(ride._id))
+    .unwrap()
+    .then((res) => {
+      console.log("Ride Finished:", res);
+      setRideFinished(true)
+      dispatch(setRideAccepted(false))
+      dispatch(setRideAcceptedData(null))
+      dispatch(setAcceptedRideIndex(null))
+      dispatch(setPickupPointCoordinates(null))
+      navigate("/captain/dashboard");
+      toast.success("Ride Finished")
+    })
+    .catch((err) => {
+      console.log("Error:", err);
+    })
+
+  }
 
   return (
     <div className="h-screen scroll-y-hidden overflow-hidden">
@@ -93,7 +117,7 @@ const PickupRide = () => {
               <h4 className="text-base font-medium text-gray-600 my-2">Drop Off</h4>
               <h6 className="text-xs font-semibold"> {ride?.destination} </h6>
             </div>
-            {/* <button
+            <button
               onClick={() => {
                 dispatch(otpVerified(false)),
                   dispatch(setDriverReached(false)),
@@ -101,7 +125,7 @@ const PickupRide = () => {
               }}
             >
               Hi
-            </button> */}
+            </button>
           </div>
           {!pointReached && !otpSubmitted && (
             <button
@@ -116,7 +140,7 @@ const PickupRide = () => {
             </button>
           )}
         </div>
-        {otpSubmitted && (
+        {otpSubmitted && !rideFinished && (
           <div
             ref={pickupRidePanelRef}
             className="overflow-hidden bg-white px-4 pb-4"
@@ -135,7 +159,9 @@ const PickupRide = () => {
                 <h6 className="text-lg font-bold"> ₹{ride?.fare} </h6>
               </div>
             </div>
-            <button className="bg-orange-400 font-medium text-white w-full py-2 rounded-lg mt-4">
+            <button onClick={()=>{
+              handleSubmit(ride)
+            }} className="bg-orange-400 font-medium text-white w-full py-2 rounded-lg mt-4">
               Drop Off
             </button>
           </div>

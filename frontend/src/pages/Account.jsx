@@ -112,7 +112,22 @@ const Account = () => {
       })  
       toast.success("Ride arriving soon")
     }
+
+    const handleFinishRide = (data) => {
+      console.log("Ride finished: ", data);
+      setDriverFound(false)   
+      setUserLocation({
+        pickup: "",
+        destination: "",
+      })  
+      dispatch(setCaptainData(null))
+      dispatch(setOtp(null))
+      setPickupCoordinates(null)
+      navigate('/account')
+      toast.success("Ride finished successfully")
+    }
   
+    socket.on("ride-ended" , handleFinishRide)
     socket.on("ride-arriving" , handleRideArriving)
     socket.on("ride-confirmed", handleRideConfirmed);
     socket.on("ride-cancelled", handleCancelRide);

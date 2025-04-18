@@ -208,6 +208,35 @@ export const rideArriving = createAsyncThunk(
     }
 )
 
+export const finishRide = createAsyncThunk(
+    'rides/finishRide',
+    async (rideId, { dispatch , rejectWithValue }) => {
+
+        try {
+            const token = localStorage.getItem('captainToken');
+            if (!token) {
+                console.log("No authentication token found!");
+                return rejectWithValue({ message: "No authentication token" });
+            }
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/ride/finish-ride`, {rideId}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            console.log('Finishing Ride:', rideId);
+            console.log('Finish API Response:', response.data);
+            dispatch(setRide(null))
+            dispatch(setCaptainData(null))
+            dispatch(setOtp(null))
+            return response.data
+            }
+        catch (error) {
+            console.log('API Error:', error);
+            return rejectWithValue({ message: error.message });
+        }
+    }
+)
+
 const rideRequestsListSlice = createSlice({
     name: "rideRequestsList",
     initialState,

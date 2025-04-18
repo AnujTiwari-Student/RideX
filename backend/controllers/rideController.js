@@ -52,7 +52,7 @@ module.exports.createRide = async (req, res) => {
 
 module.exports.fetchAllRides = async (req, res) => {
     try {
-        const rides = await rideModel.find({ status: { $ne: 'cancelled' } }).populate('user').select('-otp');
+        const rides = await rideModel.find({ status: "pending" }).populate('user').select('-otp');
         // console.log("Rides: ", rides)
         res.status(200).json(rides)
     } catch (error) {
