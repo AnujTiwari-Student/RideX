@@ -6,20 +6,33 @@ import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import MessagePanel from "./MessagePanel";
 import gsap from "gsap";
-import { cancelRide, deleteRide } from "@/features/rideRequestsListSlice";
+import { cancelRide, rideArriving } from "@/features/rideRequestsListSlice";
+import { setCurrentLocation, setPickupPoint } from "@/features/trackingLocationSlice";
 
 const CaptainRideDetailPanel = ({
   setRideDetailsPanel,
   rideAcceptedData,
+  rideDetailsPanel
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {otpSubmitted} = useSelector((state) => state.otpVerification);
+  const { otpSubmitted } = useSelector((state) => state.otpVerification);
+  const { lastLocation } = useSelector((state) => state.socket);
 
   const [messagePanelOpen, setMessagePanelOpen] = useState(false);
 
   const messagePanelRef = useRef(null);
+
+  console.log("Ride Accepted Data Destination:", rideAcceptedData?.destination);
+
+  useEffect(()=>{
+
+    dispatch(setPickupPoint(rideAcceptedData))
+    dispatch(setCurrentLocation(lastLocation))
+    console.log("Last Location:", lastLocation);
+
+  } , [rideAcceptedData])
 
   let discount = 10; 
   let totalFare = rideAcceptedData?.fare - discount; 
@@ -53,6 +66,17 @@ const CaptainRideDetailPanel = ({
       console.log("Error cancelling ride:", error);
     });
   };
+
+  const handleRideArriving = (rideId) => {
+    if(rideDetailsPanel){
+      dispatch(rideArriving(rideId))
+    .unwrap()
+    .then(() => {
+      // toast.success("Ride arriving");
+      navigate("/captain/pickup-in-progress")
+    })
+    }
+  }
 
   return (
     <div className="h-full overflow-scroll">
@@ -174,9 +198,9 @@ const CaptainRideDetailPanel = ({
       {!otpSubmitted && <div className="border-[1px] border-gray-100 w-full mb-12 mt-4 px-4"></div>}
 
       <div className="px-4 w-full absolute bottom-2 bg-white py-2">
-        <Link to='/captain/pickup-in-progress' className="bg-orange-400 w-full flex items-center justify-center py-2 rounded-xl font-semibold text-white">
+        <button onClick={()=>handleRideArriving(rideAcceptedData?._id)} className="bg-orange-400 w-full flex items-center justify-center py-2 rounded-xl font-semibold text-white">
           Pick Up
-        </Link>
+        </button>
       </div>
 
       <div

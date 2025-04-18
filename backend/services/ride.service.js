@@ -156,6 +156,26 @@ module.exports.startRide = async (rideId, otp) => {
   return ride;
 }
 
+module.exports.rideArriving = async (rideId) => {
+  if(!rideId){
+    throw new Error('Invalid ride id')
+  }
+
+  await rideModel.findOneAndUpdate(
+    { _id: rideId },
+    { $set: { status: "arriving" } },
+    { new: true },
+  );
+
+  const ride = await rideModel.findById(rideId).populate('user').populate('captain').select('+otp');
+
+  if (!ride) {
+    throw new Error('Ride not found')
+  }
+
+  return ride;
+}
+
 module.exports.cancelRide = async (rideId) => {
   if(!rideId){
     throw new Error('Invalid ride id')

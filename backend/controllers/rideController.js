@@ -146,6 +146,33 @@ module.exports.startRide = async (req, res) => {
     }
 }
 
+module.exports.rideArriving = async (req , res) =>{
+    try {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({errors: errors.array()})
+        }
+
+        const {rideId} = req.body;
+
+        const ride = await rideService.rideArriving(rideId)
+        if(!ride){
+            return res.status(404).json({message: "Ride not found"})
+        }
+
+        sendMessageToSocketId(ride.user.socketId , {
+            event: 'ride-arriving',
+            data: ride,
+        })
+
+        res.status(200).json(ride)
+    }
+    catch (error) {
+        console.log("Error: ", error)
+        res.status(500).json({message : error.message})   
+    }   
+}
+
 module.exports.cancelRide = async (req , res)=>{
     try {
         const errors = validationResult(req);
@@ -166,7 +193,7 @@ module.exports.cancelRide = async (req , res)=>{
         })
 
         res.status(200).json(ride)
-        
+
     } catch (error) {
         console.log("Error: ", error)
         res.status(500).json({message : error.message})   

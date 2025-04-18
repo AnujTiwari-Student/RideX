@@ -1,11 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { LoadScript, GoogleMap, Marker, Polyline } from '@react-google-maps/api';
+import { LoadScript, GoogleMap, Marker, Polyline, DirectionsRenderer } from '@react-google-maps/api';
 
-const LiveTracking = () => {
+const LiveTracking = ({ destination , start }) => {
+
+    // console.log("Start: ", start)
 
   const [currentPosition, setCurrentPosition] = useState({ lat: 26.8933, lng: 80.9874 });
-  const [mapCenter, setMapCenter] = useState({ lat: 26.8933, lng: 80.9874 });
+  const [mapCenter, setMapCenter] = useState( destination || { lat: 26.8933, lng: 80.9874 });
   const [path, setPath] = useState([]);
+  const [directions, setDirections] = useState(null)
+//   useEffect(() => {
+//     console.log("DIrections: ", directions)
+//   },[directions])
+
+  useEffect(()=>{
+    if(start && destination){
+      setMapCenter(destination)
+    }
+  } , [destination , start])
+
+  useEffect(() => {
+    if (start && destination) {
+      const directionsService = new window.google.maps.DirectionsService();
+      directionsService.route(
+        {
+          origin: new window.google.maps.LatLng(start.lat, start.lng),
+          destination: new window.google.maps.LatLng(destination.lat, destination.lng),
+          travelMode: window.google.maps.TravelMode.DRIVING, 
+        },
+        (result, status) => {
+          if (status === window.google.maps.DirectionsStatus.OK) {
+            console.log('Directions result:', result);
+            setDirections(result);
+          } else {
+            console.error(`Error fetching directions: ${status}`);
+          }
+        }
+      );
+    }
+  }, [start, destination]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -66,8 +99,34 @@ const LiveTracking = () => {
             mapTypeControl: false, 
           }}
         >
-          <Marker position={currentPosition} />
-          {/* <Polyline path={path} options={{ strokeColor: '#FF0000', strokeOpacity: 1, strokeWeight: 2 }} /> */}
+          {!start && !destination && (
+            <Marker position={currentPosition} />
+          )}
+
+        {destination && (
+          <Marker
+            position={destination}
+          />
+        )}
+
+        {start && (
+          <Marker
+            position={start}
+          />
+        )}
+
+          {directions && (
+            <DirectionsRenderer
+              directions={directions}
+              options={{
+                polylineOptions: {
+                  strokeColor: 'black',
+                  strokeOpacity: 1,
+                  strokeWeight: 2,
+                },
+              }}
+            />
+          )}
         </GoogleMap>
       </LoadScript>
     </div>

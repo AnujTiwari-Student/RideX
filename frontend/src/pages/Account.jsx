@@ -19,6 +19,7 @@ import { setRideRequest } from '@/features/rideRequestSlice'
 import { cancelRide, setCaptainData, setOtp } from '@/features/rideRequestsListSlice'
 import toast from 'react-hot-toast'
 import LiveTracking from '@/components/LiveTracking'
+import { getLocationCoordinates } from '@/features/trackingLocationSlice'
 
 const Account = () => {
   const dispatch = useDispatch()
@@ -32,6 +33,7 @@ const Account = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [focusField, setFocusField] = useState(null)
   const [rideData , setRideData] = useState(null)
+  const [pickupCoordinates, setPickupCoordinates] = useState(null)
   
   const { rideFare , loading , captainData } = useSelector((state) => state.rideRequestsList)
   const {user} = useSelector((state)=> state.user)
@@ -100,7 +102,18 @@ const Account = () => {
       dispatch(setCaptainData(null))
       dispatch(setOtp(null))
     }
+
+    const handleRideArriving = (data) => {
+      console.log("Ride arriving: ", data);
+      setDriverFound(false)   
+      setUserLocation({
+        pickup: "",
+        destination: "",
+      })  
+      toast.success("Ride arriving soon")
+    }
   
+    socket.on("ride-arriving" , handleRideArriving)
     socket.on("ride-confirmed", handleRideConfirmed);
     socket.on("ride-cancelled", handleCancelRide);
     console.log("Listening for ride-confirmed event...");
@@ -180,6 +193,24 @@ const Account = () => {
     dispatch(setDestination(userLocation.destination))
   }
 
+  useEffect(() => {
+    const fetchCoordinates = async () => {
+      if (userLocation.pickup) {
+        try {
+          const coords = await dispatch(
+            getLocationCoordinates(userLocation.pickup)
+          ).unwrap();
+          setPickupCoordinates(coords); 
+          console.log("Local state updated with coords:", coords);
+        } catch (error) {
+          console.error("Failed to fetch coordinates:", error);
+        }
+      }
+    };
+
+    fetchCoordinates();
+  }, [userLocation.pickup, dispatch]);;
+
   return (
     <div className='h-screen relative'>
       <div className="fixed top-4 left-4 z-[1000] bg-transparent p-3 rounded-full cursor-pointer">
@@ -189,16 +220,21 @@ const Account = () => {
           {panelOpen ? null : <Menu />}
         </div>
       </div>
-      <div className="z-20 absolute h-full w-full">
-        <LiveTracking />
+      <div className="">
+        <LiveTracking destination={captainData?.location} start={pickupCoordinates} />
       </div>
-      <div className='h-screen fixed bottom-0 w-full flex flex-col justify-end z-10'>
+      <div className='h-screen fixed bottom-0 w-full flex flex-col justify-end'>
         <div className={`${panelOpen ? "h-[30%]" : "h-[35%]"} bg-white p-5 relative ${!panelOpen ? "rounded-t-3xl" : ""}`}>
           <div className='flex justify-between items-center'>
             <h4 className='text-xl font-semibold'>{panelOpen ? "Plan A Trip" : "Find A Trip"}</h4>
             {panelOpen ? <div className='rounded-3xl bg-gray-200 py-3 px-5 w-max'>
               <h5><i className="ri-timer-line"></i> Leave Now <i className="ri-arrow-down-s-line"></i></h5>
-          </div> : null}
+          </div> :
+              null
+            }
+            {captainData ? <button className='underline underline-offset-1' onClick={()=>{
+                {captainData ? setDriverFound(true) : setLookingForDriver(true)}
+              }}> Show Ride Details </button> : null}
             <h5 ref={panelCloseRef} className='text-xl cursor-pointer' onClick={() => setPanelOpen(!panelOpen)}>
               <i className={`ri-arrow-${panelOpen ? "down" : "up"}-wide-line`}></i>
             </h5>

@@ -13,11 +13,12 @@ import { combineReducers } from 'redux'
 import otpVerificationReducer from '../features/OTPVerificationSlice'
 import driverReachedReducer from '../features/driverReachedSlice'
 import socketReducer from '../features/socketSlice'; 
+import locationTrackingReducer from '../features/trackingLocationSlice'
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user', 'captain' , 'rideAccepted' , 'otpVerification' , 'driverReached' , 'selectedVehicle' , 'payment', 'rideRequestsList'], 
+  whitelist: ['user', 'captain' , 'otpVerification' , 'driverReached' , 'selectedVehicle' , 'payment', 'rideRequestsList'], 
 }
 
 const rootReducer = combineReducers({
@@ -32,6 +33,7 @@ const rootReducer = combineReducers({
   otpVerification: otpVerificationReducer,
   driverReached: driverReachedReducer,
   socket: socketReducer, 
+  locationTracking: locationTrackingReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

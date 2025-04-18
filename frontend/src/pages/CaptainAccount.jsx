@@ -74,11 +74,11 @@ const CaptainAccount = () => {
     if(socket && connected){
       dispatch(updateLocation())
     }
-    const locationInterval = setInterval(() => {
-      dispatch(updateLocation())
-    } , 10000)
+    // const locationInterval = setInterval(() => {
+    //   dispatch(updateLocation())
+    // } , 10000)
 
-    return () => clearInterval(locationInterval)
+    // return () => clearInterval(locationInterval)
 
   }, [socket, connected, currentUser, dispatch])
 
@@ -110,7 +110,7 @@ const CaptainAccount = () => {
         </div>
       </div>
 
-      <div className="absolute top-0 left-0 w-full h-full z-20">
+      <div className="absolute top-0 left-0 w-full h-full">
         <LiveTracking />
       </div>
 

@@ -8,10 +8,20 @@ import {
 import otpInputImage from '../assets/image/Enter OTP-pana.svg'
 import { useDispatch, useSelector } from "react-redux";
 import { otpVerified } from "@/features/OTPVerificationSlice";
+import { startRide } from "@/features/rideRequestsListSlice";
 
-const PickupOtpPanel = ({setPickupRidePanelOpen , setOtpPanel}) => {
+const PickupOtpPanel = ({ setPickupRidePanelOpen , setOtpPanel , ride }) => {
 
     const dispatch = useDispatch();
+
+    const handleSubmit = (rideId , otp) => {
+      console.log(rideId , otp)
+      console.log("Handle Submit is Running")
+      dispatch(startRide({rideId , otp}))
+      setPickupRidePanelOpen(true)
+      setOtpPanel(false)
+      dispatch(otpVerified(true))
+    }
 
   return (
     <div className="h-full p-10 flex flex-col items-center">
@@ -33,7 +43,7 @@ const PickupOtpPanel = ({setPickupRidePanelOpen , setOtpPanel}) => {
       </InputOTP>
       <div className="mt-2 w-full">
         <h3 className="text-sm text-gray-400 text-center">Enter otp sent on user registered mobile number</h3>
-        <button onClick={() => {setPickupRidePanelOpen(true) ; setOtpPanel(false), dispatch(otpVerified(true))}} className="py-2 flex items-center justify-center text-base font-medium text-white w-full rounded-md mt-10 bg-orange-400">Verfiy</button>
+        <button onClick={() => handleSubmit(ride._id , ride.otp)} className="py-2 flex items-center justify-center text-base font-medium text-white w-full rounded-md mt-10 bg-orange-400">Verfiy</button>
       </div>
     </div>
   );

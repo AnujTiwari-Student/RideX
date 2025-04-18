@@ -3,6 +3,7 @@ import axios from "axios";
 
 const initialState = {
     rideRequestsList: [],
+    ride: null,
     captainData: null,
     otp: null,
     rideFare: null,
@@ -155,6 +156,58 @@ export const cancelRide = createAsyncThunk(
     }
 )
 
+export const startRide = createAsyncThunk(
+    'rides/startRide',
+    async ({rideId , otp}, { rejectWithValue }) => {
+        try{
+            const token = localStorage.getItem('captainToken');
+            if (!token) {
+                console.log("No authentication token found!");
+                return rejectWithValue({ message: "No authentication token" });
+            }
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/ride/start-ride`, {rideId , otp}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            console.log('Starting Ride:', rideId);
+            console.log('Start API Response:', response.data);
+            return response.data
+        }
+        catch (error) {
+            console.log('API Error:', error);
+            return rejectWithValue({ message: error.message });
+        }
+    }
+)
+
+export const rideArriving = createAsyncThunk(
+    'rides/rideArriving',
+    async (rideId, { dispatch , rejectWithValue }) => {
+
+        try {
+            const token = localStorage.getItem('captainToken');
+            if (!token) {
+                console.log("No authentication token found!");
+                return rejectWithValue({ message: "No authentication token" });
+            }
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/ride/arriving`, {rideId}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            console.log('Ride Arriving:', rideId);
+            console.log('Arriving API Response:', response.data);
+            dispatch(setRide(response.data))
+            return response.data
+            }
+        catch (error) {
+            console.log('API Error:', error);
+            return rejectWithValue({ message: error.message });
+        }
+    }
+)
+
 const rideRequestsListSlice = createSlice({
     name: "rideRequestsList",
     initialState,
@@ -174,7 +227,10 @@ const rideRequestsListSlice = createSlice({
         }, 
         setOtp: (state, action) => {
             state.otp = action.payload;
-        },      
+        }, 
+        setRide: (state, action) => {
+            state.ride = action.payload;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -224,7 +280,7 @@ const rideRequestsListSlice = createSlice({
     }
 })
 
-export const { setRideRequestsList , addRideRequest , setCaptainData , setOtp } = rideRequestsListSlice.actions;
+export const { setRideRequestsList , addRideRequest , setCaptainData , setOtp , setRide } = rideRequestsListSlice.actions;
 
 const rideRequestsListReducer = rideRequestsListSlice.reducer;
 export default rideRequestsListReducer

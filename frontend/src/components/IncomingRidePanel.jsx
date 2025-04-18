@@ -203,6 +203,7 @@ const IncomingRidePanel = ({
       >
         <CaptainRideDetailPanel
           setRideDetailsPanel={setRideDetailsPanel}
+          rideDetailsPanel={rideDetailsPanel}
           rideAcceptedData={rideAcceptedData}
           paymentMethod={paymentMethod}
         />
